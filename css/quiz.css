@@ -1,0 +1,194 @@
+/* 메인 퀴즈 앱 화면 */
+#mainApp {
+  display: block;
+}
+
+.quiz-box {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 22px 18px;
+  border: 2px solid var(--border);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.04);
+}
+
+.info-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-sub);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px dashed #EFEAE1;
+}
+
+/* 1. 단어 맞히기 */
+.hiragana-board {
+  background: #FAFAF7;
+  border: 2px solid #EAE4D9;
+  border-radius: 16px;
+  padding: 24px 14px;
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.hiragana-word {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #1A202C;
+  letter-spacing: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  word-break: break-all;
+}
+
+.voice-btn {
+  background: #EBF8FF;
+  border: 1.5px solid #BEE3F8;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.voice-btn:active {
+  transform: scale(0.92);
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.option-item {
+  background: #FFFFFF;
+  border: 2px solid var(--border);
+  box-shadow: 0 3px 0 var(--border);
+  border-radius: 14px;
+  padding: 13px 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.option-item:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--border);
+}
+
+.option-label {
+  background: #F3ECE1;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #64748B;
+  flex-shrink: 0;
+}
+
+.option-item.selected {
+  border-color: var(--orange);
+  box-shadow: 0 3px 0 var(--orange-deep);
+  background: #FFF7ED;
+  color: var(--orange-deep);
+}
+
+.option-item.selected .option-label {
+  background: var(--orange);
+  color: #FFFFFF;
+}
+
+.option-item.correct {
+  border-color: #10B981 !important;
+  box-shadow: 0 3px 0 #059669 !important;
+  background: #ECFDF5 !important;
+  color: #065F46 !important;
+}
+
+.option-item.wrong {
+  border-color: #EF4444 !important;
+  box-shadow: 0 3px 0 #DC2626 !important;
+  background: #FEF2F2 !important;
+  color: #991B1B !important;
+}
+
+/* 2. 문장 블록 나열 */
+.korean-hint {
+  background: #FEF9C3;
+  border: 2px solid #FDE047;
+  border-radius: 14px;
+  padding: 14px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #854D0E;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.section-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-sub);
+  margin-bottom: 6px;
+}
+
+.answer-tray {
+  min-height: 60px;
+  background: #F8FAFC;
+  border: 2.5px dashed #CBD5E1;
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.block-shelf {
+  min-height: 60px;
+  background: #EDE6D8;
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.hiragana-block {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  background: #FFFFFF;
+  border: 2px solid #D5CCBE;
+  box-shadow: 0 3px 0 var(--block-shadow);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #2D3748;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.hiragana-block:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--block-shadow);
+}

@@ -1,0 +1,79 @@
+/* 문장 블록 나열 전용 잠금 게이트 스타일 */
+#sentLockBox {
+  text-align: center;
+}
+
+#sentLockBox .lock-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 24px 12px;
+  width: 100%;
+}
+
+.lock-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.lock-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--board-green);
+  margin-bottom: 8px;
+}
+
+.lock-desc {
+  font-size: 0.9rem;
+  color: var(--text-sub);
+  margin-bottom: 24px;
+  font-weight: 700;
+}
+
+.pw-input {
+  width: 100%;
+  max-width: 280px;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  font-size: 1.15rem;
+  text-align: center;
+  letter-spacing: 2px;
+  font-weight: 800;
+  color: var(--text);
+  outline: none;
+  margin-bottom: 14px;
+}
+
+.pw-input:focus {
+  border-color: var(--board-green);
+  background: #FAF9F5;
+}
+
+.lock-btn {
+  width: 100%;
+  max-width: 280px;
+  background: var(--board-green);
+  color: #FFFFFF;
+  border: none;
+  box-shadow: 0 4px 0 var(--board-green-dark);
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.lock-btn:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.lock-error {
+  color: #EF4444;
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin-top: 10px;
+  min-height: 20px;
+}
