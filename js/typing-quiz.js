@@ -17,8 +17,7 @@ var ROMAJI_TABLE = {
   "gya": "ぎゃ", "gyu": "ぎゅ", "gyo": "ぎょ", "gye": "ぎぇ",
   "zya": "じゃ", "zyu": "じゅ", "zyo": "じょ", "zye": "じぇ",
   "dya": "ぢゃ", "dyu": "ぢゅ", "dyo": "ぢょ", "dye": "ぢぇ",
-  "bya": "비ゃ", "byu": "びゅ", "byo": "びょ", "bye": "びぇ",
-  "bya": "びゃ",
+  "bya": "びゃ", "byu": "びゅ", "byo": "びょ", "bye": "びぇ",
   "pya": "ぴゃ", "pyu": "ぴゅ", "pyo": "ぴょ", "pye": "ぴぇ",
   "xya": "ゃ", "xyu": "ゅ", "xyo": "ょ",
   "lya": "ゃ", "lyu": "ゅ", "lyo": "ょ",
@@ -31,12 +30,12 @@ var ROMAJI_TABLE = {
   "nn": "ん", "xn": "ん",
   "ha": "は", "hi": "ひ", "hu": "ふ", "fu": "ふ", "he": "へ", "ho": "ほ",
   "fa": "ふぁ", "fi": "ふぃ", "fe": "ふぇ", "fo": "ふぉ",
-  "ma": "ま", "mi": "み", "mu": "む", "me": "め", "mo": "모",
-  "mo": "も",
+  "ma": "ま", "mi": "み", "mu": "む", "me": "め", "mo": "も",
   "ya": "や", "yu": "ゆ", "yo": "よ",
   "ra": "ら", "ri": "り", "ru": "る", "re": "れ", "ro": "ろ",
   "wa": "わ", "wo": "を",
-  "ga": "が", "gi": "ぎ", "gu": "ぐ", "ge": "げ", "go": "ご",
+  "ga": "가", "gi": "ぎ", "gu": "ぐ", "ge": "げ", "go": "ご",
+  "ga": "が",
   "za": "ざ", "zi": "じ", "ji": "じ", "zu": "ず", "ze": "ぜ", "zo": "ぞ",
   "ja": "じゃ", "ju": "じゅ", "jo": "じょ",
   "da": "だ", "di": "ぢ", "du": "づ", "de": "で", "do": "ど",
@@ -69,9 +68,16 @@ function convertRomajiTextToHiragana(text) {
       continue;
     }
 
-    // 1. 촉음 체크: 같은 자음 2연속 (예: tt -> っt, kk -> っk) (단, nn, aeiouwn- 제외)
+    // 1. 촉음 체크:
+    // (A) 같은 자음 2연속: tt -> っt, kk -> っk, ss -> っs 등 (단, nn, aeiouwn- 제외)
+    // (B) tch -> っch (예: chotto -> ちょっと)
     if (i + 1 < len) {
       var nextCh = text[i + 1].toLowerCase();
+      if (chLower === 't' && nextCh === 'c' && i + 2 < len && text[i + 2].toLowerCase() === 'h') {
+        result += "っ";
+        i++;
+        continue;
+      }
       if (chLower === nextCh && !"aeiouwn-".includes(chLower)) {
         result += "っ";
         i++;
@@ -92,15 +98,17 @@ function convertRomajiTextToHiragana(text) {
     }
     if (matched) continue;
 
-    // 3. 1글자 모음 매칭 (단, 뒤에 y가 붙는 자음이 아니어야 함)
-    // 만약 현재 문자가 자음(k, s, t, n, h, m, r, g, z, d, b, p 등)이고 뒤에 y가 온다면 1글자로 변환하지 않고 유지
-    if (i + 1 < len && text[i + 1].toLowerCase() === 'y') {
-      result += ch;
-      i++;
-      continue;
+    // 3. 1글자 모음 매칭
+    // 만약 현재 문자가 자음이고 뒤에 y 또는 h(ch, sh 등)가 온다면 아직 조합 중이므로 1글자로 변환하지 않고 유지
+    if (i + 1 < len) {
+      var nextChar = text[i + 1].toLowerCase();
+      if (nextChar === 'y' || (chLower === 's' && nextChar === 'h') || (chLower === 'c' && nextChar === 'h')) {
+        result += ch;
+        i++;
+        continue;
+      }
     }
 
-    // 뒤에 모음이나 다른 자음이 올 수 있는 1글자 자음(k, s 등)은 모음이 아니므로 변환 테이블에 없음
     // 모음 (a, i, u, e, o)인 경우에만 1글자 매칭
     if (ROMAJI_TABLE[chLower]) {
       result += ROMAJI_TABLE[chLower];
@@ -149,7 +157,6 @@ var exactSentenceList = [
   { "sentence": "わたしも～", "mean": "나도~" },
   { "sentence": "ぼくは　てんぷらうどんに　するよ。", "mean": "나는 튀김우동으로 할게." },
   { "sentence": "うどんに　カレーは　ちょっと", "mean": "우동에 카레는 좀..." },
-  { "sentence": "じゃあ、あした 12じに　가っこうの　まえで。", "mean": "그럼, 내일 12시에 학교 앞에서." },
   { "sentence": "じゃあ、あした 12じに　がっこうの　まえで。", "mean": "그럼, 내일 12시에 학교 앞에서." },
   { "sentence": "は～い。", "mean": "네~" },
   { "sentence": "とても　きれいです。", "mean": "매우 예쁘다." },
@@ -282,19 +289,20 @@ function nextTypeSentence() {
 }
 
 /**
- * 문장 정규화 (문장부호 및 띄어쓰기 완전 배제 비교)
- * - 온점(., 。), 쉼표(,, 、), 물음표(?, ？), 느낌표(!, ！), 물결표(~, ～), 따옴표, 괄호, 공백 전면 제거
+ * 문장 정규화:
+ * - 물결표(~, ～), 온점(., 。), 쉼표(,, 、), 물음표(?, ？), 느낌표(!, ！), 말줄임표(…), 공백 등
+ *   문장 어디에 위치하든 모든 문장부호와 띄어쓰기를 100% 제거
  */
 function stripAllPunctuationAndSpace(str) {
   if (!str) return "";
   return str
     .replace(/[\s\u3000]+/g, '')                             // 모든 공백(반각/전각) 제거
-    .replace(/[.。、,?!？！\~～…\(\)（）"'`·\-_]/g, '')     // 모든 문장부호 제거
+    .replace(/[~～.。、,?!？！…\(\)（）"'`·\-_~]/g, '')     // 모든 물결표 및 문장부호 제거
     .trim();
 }
 
 /**
- * 정답 확인 (문장부호 유무 상관없이 문자 알맹이만 일치하면 정답 인정)
+ * 정답 확인 (문장부호/물결표 유무와 무관하게 문자 알맹이만 일치하면 정답 인정)
  */
 function checkTypeSentence() {
   if (isTypeChecked) return;
@@ -362,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // 2. 쉼표 ',' 입력 시 일본어 쉼표 '、'로 변환
       converted = converted.replace(/,/g, '、');
 
-      // 3. 로마자 -> 히라가나 변환 (요음 kya, kyu, kyo, sha, cha, nya 등 완벽 처리)
+      // 3. 로마자 -> 히라가나 변환 (chotto, motto, kya, sha 등 완벽 지원)
       converted = convertRomajiTextToHiragana(converted);
 
       if (converted !== oldVal) {
