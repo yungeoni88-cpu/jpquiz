@@ -114,30 +114,25 @@
         <div class="katakana-shelf" id="katakanaShelf"></div>
       </div>
 
-      <div class="section-label">✍️ 입력한 일본어 문장:</div>
+      <div class="section-label">✍️ 입력한 일본어 문장: <span id="romajiPending" class="romaji-pending-badge" style="display:none;"></span></div>
       <div class="type-input-area">
-        <input type="text" id="typeSentenceInput" class="type-input" placeholder="아래 키보드로 히라가나를 입력하세요" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <input type="text" id="typeSentenceInput" class="type-input" placeholder="키보드나 화면 버튼으로 로마자를 입력하세요 (예: udon -> うどん)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <button type="button" class="type-clear-btn" onclick="clearTypeInput()" title="입력창 전체 지우기">지우기</button>
       </div>
 
-      <!-- 화면 가상 키보드 (오십음도 줄별) -->
+      <!-- QWERTY 화면 가상 키보드 -->
       <div class="virtual-keyboard">
-        <div class="section-label" style="margin-bottom: 4px;">가상 키보드 (행 선택 후 글자 터치):</div>
+        <div class="section-label" style="margin-bottom: 6px;">가상 키보드 (QWERTY 로마자 입력):</div>
         
-        <!-- 오십음도 행 선택 탭 -->
-        <div class="vk-row-tabs" id="vkRowTabs"></div>
-
-        <!-- 글자 키 버튼 -->
-        <div class="vk-char-keys" id="vkCharKeys"></div>
+        <!-- QWERTY 자판 3줄 -->
+        <div class="qwerty-container" id="vkQwertyRows"></div>
 
         <!-- 보조 기능 키 (공백, 기호, 한 글자 삭제) -->
         <div class="vk-action-bar">
-          <button type="button" class="vk-fn-key" onclick="insertChar('、')">、</button>
-          <button type="button" class="vk-fn-key" onclick="insertChar('。')">。</button>
-          <button type="button" class="vk-fn-key" onclick="insertChar('？')">？</button>
-          <button type="button" class="vk-fn-key" onclick="insertChar('！')">！</button>
-          <button type="button" class="vk-fn-key space" onclick="insertChar(' ')">띄어쓰기</button>
-          <button type="button" class="vk-fn-key backspace" onclick="deleteLastChar()">⌫ 지움</button>
+          <button type="button" class="vk-fn-key" onclick="handleKeyInput('？')">？</button>
+          <button type="button" class="vk-fn-key" onclick="handleKeyInput('！')">！</button>
+          <button type="button" class="vk-fn-key space" onclick="handleSpaceKey()">Space (공백)</button>
+          <button type="button" class="vk-fn-key backspace" onclick="deleteLastChar()">⌫ Backspace</button>
         </div>
       </div>
 
