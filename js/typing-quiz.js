@@ -184,17 +184,28 @@ var isTypeChecked = false;
 var typeSolved = 0;
 
 /**
- * 문장에서 가타카나 단어만 추출 (오직 가타카나만 칩으로 제공)
+ * 문장에서 가타카나 단어 및 한자 단어 추출 (블록 칩으로 제공)
  */
 function getSentenceHintChips(item) {
   if (!item) return [];
   var set = [];
 
-  // 오직 가타카나 단어(유니코드 30A0-30FF 및 장음 부호 ー)만 추출
+  // 1. 가타카나 단어 추출 (유니코드 30A0-30FF 및 장음 부호 ー)
   var kataMatches = item.sentence.match(/[\u30A0-\u30FFー]+/g);
   if (kataMatches) {
     kataMatches.forEach(function(k) {
       if (!set.includes(k)) set.push(k);
+    });
+  }
+
+  // 2. 한자 단어 추출 (유니코드 4E00-9FFF 범위 및 연관 한자어: 田中さん, 何, 好き, 人, 日本, シウ君, 12じ, 900円, 1200円 등)
+  var kanjiMatches = item.sentence.match(/([0-9０-９]+[円じ]|[\u4E00-\u9FFF][\u4E00-\u9FFFぁ-ん]*)/g);
+  if (kanjiMatches) {
+    kanjiMatches.forEach(function(k) {
+      var clean = k.replace(/[\s\u3000.。、,?!？！~～]/g, '').trim();
+      if (clean && !set.includes(clean)) {
+        set.push(clean);
+      }
     });
   }
 
