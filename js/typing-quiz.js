@@ -26,7 +26,8 @@ var ROMAJI_TABLE = {
   "ka": "か", "ki": "き", "ku": "く", "ke": "け", "ko": "こ",
   "sa": "さ", "si": "し", "shi": "し", "su": "す", "se": "せ", "so": "そ",
   "ta": "た", "ti": "ち", "chi": "ち", "tu": "つ", "te": "て", "to": "と",
-  "na": "な", "ni": "に", "nu": "ぬ", "ne": "ね", "no": "の",
+  "na": "나", "ni": "に", "nu": "ぬ", "ne": "ね", "no": "の",
+  "na": "な",
   "nn": "ん", "xn": "ん",
   "ha": "は", "hi": "ひ", "hu": "ふ", "fu": "ふ", "he": "へ", "ho": "ほ",
   "fa": "ふぁ", "fi": "ふぃ", "fe": "ふぇ", "fo": "ふぉ",
@@ -34,8 +35,7 @@ var ROMAJI_TABLE = {
   "ya": "や", "yu": "ゆ", "yo": "よ",
   "ra": "ら", "ri": "り", "ru": "る", "re": "れ", "ro": "ろ",
   "wa": "わ", "wo": "を",
-  "ga": "가", "gi": "ぎ", "gu": "ぐ", "ge": "げ", "go": "ご",
-  "ga": "が",
+  "ga": "が", "gi": "ぎ", "gu": "ぐ", "ge": "げ", "go": "ご",
   "za": "ざ", "zi": "じ", "ji": "じ", "zu": "ず", "ze": "ぜ", "zo": "ぞ",
   "ja": "じゃ", "ju": "じゅ", "jo": "じょ",
   "da": "だ", "di": "ぢ", "du": "づ", "de": "で", "do": "ど",
@@ -69,8 +69,7 @@ function convertRomajiTextToHiragana(text) {
     }
 
     // 1. 촉음 체크:
-    // (A) 같은 자음 2연속: tt -> っt, kk -> っk, ss -> っs 등 (단, nn, aeiouwn- 제외)
-    // (B) tch -> っch (예: chotto -> ちょっと)
+    // (A) tch -> っch (예: chotto -> ちょっと)
     if (i + 1 < len) {
       var nextCh = text[i + 1].toLowerCase();
       if (chLower === 't' && nextCh === 'c' && i + 2 < len && text[i + 2].toLowerCase() === 'h') {
@@ -78,6 +77,7 @@ function convertRomajiTextToHiragana(text) {
         i++;
         continue;
       }
+      // (B) 같은 자음 2연속: tt -> っt, kk -> っk, ss -> っs 등 (단, nn, aeiouwn- 제외)
       if (chLower === nextCh && !"aeiouwn-".includes(chLower)) {
         result += "っ";
         i++;
@@ -99,7 +99,7 @@ function convertRomajiTextToHiragana(text) {
     if (matched) continue;
 
     // 3. 1글자 모음 매칭
-    // 만약 현재 문자가 자음이고 뒤에 y 또는 h(ch, sh 등)가 온다면 아직 조합 중이므로 1글자로 변환하지 않고 유지
+    // 만약 현재 문자가 자음이고 뒤에 y 또는 h(ch, sh 등)가 온다면 조합 대기
     if (i + 1 < len) {
       var nextChar = text[i + 1].toLowerCase();
       if (nextChar === 'y' || (chLower === 's' && nextChar === 'h') || (chLower === 'c' && nextChar === 'h')) {
@@ -135,7 +135,7 @@ function convertRomajiTextToHiragana(text) {
 }
 
 /**
- * 3-4과 문장 CSV 데이터 목록 (37문장)
+ * 3-4과 문장 데이터 목록 (한자 100% 완전 배제, 모두 히라가나/가타카나로 변환)
  */
 var exactSentenceList = [
   { "sentence": "うどんに　します。", "mean": "우동으로 하겠습니다." },
@@ -157,23 +157,24 @@ var exactSentenceList = [
   { "sentence": "わたしも～", "mean": "나도~" },
   { "sentence": "ぼくは　てんぷらうどんに　するよ。", "mean": "나는 튀김우동으로 할게." },
   { "sentence": "うどんに　カレーは　ちょっと", "mean": "우동에 카레는 좀..." },
-  { "sentence": "じゃあ、あした 12じに　がっこうの　まえで。", "mean": "그럼, 내일 12시에 학교 앞에서." },
+  { "sentence": "じゃあ、あした じゅうにじに　がっこうの　まえで。", "mean": "그럼, 내일 12시에 학교 앞에서." },
   { "sentence": "は～い。", "mean": "네~" },
   { "sentence": "とても　きれいです。", "mean": "매우 예쁘다." },
-  { "sentence": "田中さん、のみものでは　何が　好きですか。", "mean": "다나카씨는 음료중에서 무엇을 좋아합니까?" },
-  { "sentence": "コーラが　好きです。", "mean": "콜라를 좋아합니다." },
+  { "sentence": "たなかさん、のみものでは　なにが　すきですか。", "mean": "다나카씨는 음료중에서 무엇을 좋아합니까?" },
+  { "sentence": "コーラが　すきです。", "mean": "콜라를 좋아합니다." },
   { "sentence": "あの　おんせんは　どうですか。", "mean": "저 온천은 어때요?" },
   { "sentence": "とても　ゆうめいです。", "mean": "매우 유명합니다." },
   { "sentence": "あまり　ゆうめいじゃ　ありません", "mean": "그다지 유명하지 않습니다." },
   { "sentence": "にぎやかだね。", "mean": "번화하네." },
-  { "sentence": "うん。だいこくの　人も　おおいね。", "mean": "응. 외국인도 많네." },
+  { "sentence": "うん。がいこくの　ひとも　おおいね。", "mean": "응. 외국인도 많네." },
   { "sentence": "あの　ふね、いくらかな。", "mean": "저 배는 얼마일까?" },
-  { "sentence": "ええと、ひとり 900円。", "mean": "음, 한 사람에 900엔." },
-  { "sentence": "シウ君は　日本の　どんな　たべものが　好き？", "mean": "시우 군은 일본의 어떤 음식을 좋아해?" },
-  { "sentence": "たこやきが　いちばん　好き。", "mean": "타코야끼를 가장 좋아해." },
+  { "sentence": "ええと、ひとり きゅうひゃくえん。", "mean": "음, 한 사람에 900엔." },
+  { "sentence": "シウくんは　にほんの　どんな　たべものが　すき？", "mean": "시우 군은 일본의 어떤 음식을 좋아해?" },
+  { "sentence": "たこやきが　いちばん　すき。", "mean": "타코야끼를 가장 좋아해." },
   { "sentence": "すみません。これ、ふたつ　ください。", "mean": "실례합니다. 이거, 두 개 주세요." },
-  { "sentence": "はい、ふたつですね。1200円です。", "mean": "네, 두 개네요. 1200엔입니다." },
+  { "sentence": "はい、ふたつですね。せんにひゃくえんです。", "mean": "네, 두 개네요. 1200엔입니다." },
   { "sentence": "わあ、すごく　おいしい！", "mean": "와, 정말 맛있어!" },
+  { "sentence": "わあ、はやい。おもしろ이ね。", "mean": "와, 빠르다. 재미있네" },
   { "sentence": "わあ、はやい。おもしろいね。", "mean": "와, 빠르다. 재미있네" }
 ];
 
@@ -289,27 +290,46 @@ function nextTypeSentence() {
 }
 
 /**
+ * 가타카나를 히라가나로 변환하는 유틸리티 (발음 비교용)
+ * (유니코드 0x30A1-0x30F6 -> 0x3041-0x3096)
+ */
+function katakanaToHiragana(str) {
+  if (!str) return "";
+  return str.replace(/[\u30A1-\u30F6]/g, function(match) {
+    var chr = match.charCodeAt(0) - 0x60;
+    return String.fromCharCode(chr);
+  });
+}
+
+/**
  * 문장 정규화:
  * - 물결표(~, ～), 온점(., 。), 쉼표(,, 、), 물음표(?, ？), 느낌표(!, ！), 말줄임표(…), 공백 등
  *   문장 어디에 위치하든 모든 문장부호와 띄어쓰기를 100% 제거
+ * - 가타카나를 히라가나로 모두 변환하여, 가타카나 칩으로 넣었든 히라가나로 직접 타이핑했든 똑같이 정답 인정!
  */
 function stripAllPunctuationAndSpace(str) {
   if (!str) return "";
-  return str
+  // 1. 가타카나를 히라가나로 정규화
+  var hira = katakanaToHiragana(str);
+
+  // 2. 모든 공백 및 모든 문장부호(물결표, 마침표, 쉼표 등) 제거
+  return hira
     .replace(/[\s\u3000]+/g, '')                             // 모든 공백(반각/전각) 제거
     .replace(/[~～.。、,?!？！…\(\)（）"'`·\-_~]/g, '')     // 모든 물결표 및 문장부호 제거
     .trim();
 }
 
 /**
- * 정답 확인 (문장부호/물결표 유무와 무관하게 문자 알맹이만 일치하면 정답 인정)
+ * 정답 확인:
+ * - 문장부호/물결표 유무 무관
+ * - 가타카나 칩을 넣었든, 히라가나 발음으로 직접 입력했든 둘 다 정답 인정!
  */
 function checkTypeSentence() {
   if (isTypeChecked) return;
   var input = document.getElementById('typeSentenceInput');
   if (!input) return;
 
-  // 혹시 끝에 남은 미변환 n 처리 (예: ...desun -> ...ですん)
+  // 끝에 남은 미변환 n 처리 (예: ...desun -> ...ですん)
   var val = input.value;
   if (/n$/i.test(val)) {
     val = val.replace(/n$/i, 'ん');
