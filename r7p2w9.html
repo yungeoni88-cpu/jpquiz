@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>일본어 단어T</title>
+  
+  <!-- 웹 폰트 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Square+Round:wght@600;700;800&family=M+PLUS+Rounded+1c:wght@700;800&display=swap" rel="stylesheet">
+  
+  <!-- 스타일시트 -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/lock.css">
+  <link rel="stylesheet" href="css/quiz.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- 메인 퀴즈 화면 -->
+  <div id="mainApp">
+    <header>
+      <div class="title-box">
+        <span class="badge">고등학교 일본어</span>
+        <h1>2학기 기말고사 단어 퀴즈</h1>
+      </div>
+    </header>
+
+    <div class="tab-container">
+      <button class="tab-btn active" id="btnTabWord" onclick="changeMode('word')">💡 단어 뜻</button>
+      <button class="tab-btn" id="btnTabSent" onclick="changeMode('sentence')">🧩 블록 나열</button>
+      <button class="tab-btn" id="btnTabType" onclick="changeMode('typing')">⌨️ 문장 입력</button>
+    </div>
+
+    <!-- 1. 단어 맞히기 -->
+    <div id="wordQuizArea" class="quiz-box">
+      <div class="info-header">
+        <span style="font-weight:800; color:var(--board-green);">💡 단어 랜덤 퀴즈</span>
+        <span>진행 <b id="wordCount">0</b> | 정답 <b id="wordScore" style="color:#059669;">0</b></span>
+      </div>
+
+      <div class="hiragana-board">
+        <div class="hiragana-word">
+          <span id="targetHiragana">-</span>
+          <button class="voice-btn" onclick="speakCurrentWord()" title="발음 듣기">🔊</button>
+        </div>
+      </div>
+
+      <div class="options-list" id="optionsBox"></div>
+      <div class="feedback-text" id="wordFeedback"></div>
+
+      <div class="button-group">
+        <button class="action-btn btn-check" id="btnCheckWord" onclick="checkWord()">정답 확인</button>
+        <button class="action-btn btn-next" id="btnNextWord" onclick="nextWord()" disabled>다음 문제 ➔</button>
+      </div>
+    </div>
+
+    <!-- 2. 문장 블록 나열 영역 -->
+    <div id="sentQuizArea" style="display: none;">
+      
+      <!-- 문장 블록 전용 잠금 게이트 카드 -->
+      <div id="sentLockBox" class="quiz-box">
+        <div class="lock-card">
+          <div class="lock-icon">🔒</div>
+          <div class="lock-title">문장 블록 나열 퀴즈</div>
+          <div class="lock-desc">이 기능은 비밀번호를 입력해야 입장할 수 있습니다.</div>
+          <input type="password" id="sentPwInput" class="pw-input" placeholder="비밀번호 입력" onkeyup="if(window.event.keyCode==13){unlockSentenceQuiz();}">
+          <br>
+          <button class="lock-btn" onclick="unlockSentenceQuiz()">입장하기</button>
+          <div class="lock-error" id="sentLockError"></div>
+        </div>
+      </div>
+
+      <!-- 문장 퀴즈 실제 문제 풀이 본체 -->
+      <div id="sentQuizContent" class="quiz-box" style="display: none;">
+        <div class="info-header">
+          <span style="color:var(--board-green); font-weight:800;">🧩 문장 랜덤 퀴즈</span>
+          <span>진행 문제 <b id="sentCount">0</b></span>
+        </div>
+
+        <div class="korean-hint" id="targetKorean">한국어 뜻이 표시됩니다</div>
+
+        <div class="section-label">만든 문장 (터치하면 아래로 돌아갑니다):</div>
+        <div class="answer-tray" id="answerTray"></div>
+
+        <div class="section-label">단어 블록을 순서대로 터치하세요:</div>
+        <div class="block-shelf" id="blockShelf"></div>
+
+        <div class="feedback-text" id="sentFeedback"></div>
+
+        <div class="button-group">
+          <button class="action-btn btn-check" onclick="resetSentenceBlocks()">다시 놓기</button>
+          <button class="action-btn btn-check" id="btnCheckSent" onclick="checkSentence()">정답 확인</button>
+          <button class="action-btn btn-next" id="btnNextSent" onclick="nextSentence()" disabled>다음 문제 ➔</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 3. 문장 직접 입력 완성 영역 -->
+    <div id="typeQuizArea" class="quiz-box" style="display: none;">
+      <div class="info-header">
+        <span style="color:var(--board-green); font-weight:800;">⌨️ 문장 입력 완성 퀴즈</span>
+        <span>진행 문제 <b id="typeCount">0</b></span>
+      </div>
+
+      <div class="korean-hint" id="typeKoreanHint">한국어 뜻이 표시됩니다</div>
+
+      <div class="section-label">✍️ 일본어 문장 입력:</div>
+      <div class="type-input-area">
+        <input type="text" id="typeSentenceInput" class="type-input" placeholder="문장을 입력하세요" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button type="button" class="type-clear-btn" onclick="clearTypeInput()" title="입력창 전체 지우기">지우기</button>
+      </div>
+
+      <!-- 가타카나 칩 (가타카나가 있는 경우에만 표시) -->
+      <div id="katakanaBoxBottom" style="display: none; margin-top: 10px;">
+        <div class="section-label">🏷️ 가타카나 단어:</div>
+        <div class="katakana-shelf-bottom" id="katakanaShelfBottom"></div>
+      </div>
+
+      <div class="feedback-text" id="typeFeedback"></div>
+
+      <div class="button-group">
+        <button class="action-btn btn-check" id="btnCheckType" onclick="checkTypeSentence()">정답 확인</button>
+        <button class="action-btn btn-next" id="btnNextType" onclick="nextTypeSentence()" disabled>다음 문제 ➔</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- 자바스크립트 모듈 -->
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script src="js/word-quiz.js"></script>
+<script src="js/sentence-quiz.js"></script>
+<script src="js/typing-quiz.js"></script>
+
+</body>
+</html>
