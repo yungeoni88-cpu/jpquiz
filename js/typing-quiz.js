@@ -184,27 +184,17 @@ var isTypeChecked = false;
 var typeSolved = 0;
 
 /**
- * 문장에서 클릭 가능한 단어 힌트 칩 목록 추출
+ * 문장에서 가타카나 단어만 추출 (오직 가타카나만 칩으로 제공)
  */
 function getSentenceHintChips(item) {
   if (!item) return [];
   var set = [];
 
-  // 1. 가타카나 단어 최우선 등록
+  // 오직 가타카나 단어(유니코드 30A0-30FF 및 장음 부호 ー)만 추출
   var kataMatches = item.sentence.match(/[\u30A0-\u30FFー]+/g);
   if (kataMatches) {
     kataMatches.forEach(function(k) {
       if (!set.includes(k)) set.push(k);
-    });
-  }
-
-  // 2. chunks 단어들 등록
-  if (item.chunks && item.chunks.length > 0) {
-    item.chunks.forEach(function(chk) {
-      var clean = chk.replace(/[\s\u3000.。、,?!？！~～]/g, '').trim();
-      if (clean && clean.length > 1 && !set.includes(clean)) {
-        set.push(clean);
-      }
     });
   }
 
