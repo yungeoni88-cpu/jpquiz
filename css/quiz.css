@@ -248,13 +248,36 @@
   font-size: 0.88rem;
 }
 
-.romaji-pending-badge {
-  background: #FEF08A;
-  color: #854D0E;
-  border: 1px solid #FACC15;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 0.82rem;
+/* 하단 가타카나 칩 보관함 */
+.katakana-shelf-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  background: #FFF7ED;
+  border: 1.5px dashed #FB923C;
+  border-radius: 12px;
+}
+
+.katakana-chip {
+  background: #FFEDD5;
+  color: #C2410C;
+  border: 1.5px solid #FB923C;
+  box-shadow: 0 3px 0 #EA580C;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 1.05rem;
   font-weight: 800;
-  margin-left: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.katakana-chip:hover {
+  background: #FED7AA;
+}
+
+.katakana-chip:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #EA580C;
 }

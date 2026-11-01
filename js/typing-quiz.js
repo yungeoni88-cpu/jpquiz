@@ -1,104 +1,123 @@
 /**
- * 로마자 -> 히라가나 매핑 테이블
+ * 로마자 -> 히라가나 매핑 테이블 (긴 음절 우선 정렬 처리)
  */
 var ROMAJI_TABLE = {
-  // 모음
-  "a": "あ", "i": "い", "u": "う", "e": "え", "o": "お",
-  
-  // k
-  "ka": "か", "ki": "き", "ku": "く", "ke": "け", "ko": "こ",
+  // 3글자 이상 (요음, 특수음)
   "kya": "きゃ", "kyu": "きゅ", "kyo": "きょ",
-  
-  // s
-  "sa": "さ", "si": "し", "shi": "し", "su": "す", "se": "せ", "so": "そ",
-  "sha": "しゃ", "shu": "しゅ", "sho": "しょ",
+  "sha": "しゃ", "shu": "しゅ", "sho": "しょ", "she": "しぇ",
   "sya": "しゃ", "syu": "しゅ", "syo": "しょ",
-
-  // t
-  "ta": "た", "ti": "ち", "chi": "ち", "tu": "つ", "tsu": "つ", "te": "て", "to": "と",
-  "cha": "ちゃ", "chu": "ちゅ", "che": "ちぇ", "cho": "ちょ",
+  "cha": "ちゃ", "chu": "ちゅ", "cho": "ちょ", "che": "ちぇ",
   "tya": "ちゃ", "tyu": "ちゅ", "tyo": "ちょ",
-
-  // n
-  "na": "な", "ni": "に", "nu": "ぬ", "ne": "ね", "no": "の",
+  "tsu": "つ",
   "nya": "にゃ", "nyu": "にゅ", "nyo": "にょ",
-  "nn": "ん", "xn": "ん",
-
-  // h
-  "ha": "は", "hi": "ひ", "hu": "ふ", "fu": "ふ", "he": "へ", "ho": "ほ",
   "hya": "ひゃ", "hyu": "ひゅ", "hyo": "ひょ",
-  "fa": "ふぁ", "fi": "ふぃ", "fe": "ふぇ", "fo": "ふぉ",
-
-  // m
-  "ma": "ま", "mi": "み", "mu": "む", "me": "め", "mo": "も",
   "mya": "みゃ", "myu": "みゅ", "myo": "みょ",
-
-  // y
-  "ya": "や", "yu": "ゆ", "yo": "よ",
-
-  // r
-  "ra": "ら", "ri": "り", "ru": "る", "re": "레", "ro": "ろ",
-  "re": "れ",
   "rya": "りゃ", "ryu": "りゅ", "ryo": "りょ",
-
-  // w
-  "wa": "わ", "wo": "を",
-
-  // g
-  "ga": "が", "gi": "ぎ", "gu": "ぐ", "ge": "げ", "go": "ご",
   "gya": "ぎゃ", "gyu": "ぎゅ", "gyo": "ぎょ",
+  "zya": "じゃ", "zyu": "じゅ", "zyo": "じょ",
+  "dya": "ぢゃ", "dyu": "ぢゅ", "dyo": "ぢょ",
+  "bya": "びゃ", "byu": "びゅ", "byo": "びょ",
+  "pya": "ぴゃ", "pyu": "ぴゅ", "pyo": "ぴょ",
+  "xtsu": "っ", "xtu": "っ", "ltsu": "っ", "ltu": "っ",
+  "xya": "ゃ", "xyu": "ゅ", "xyo": "ょ",
+  "lya": "ゃ", "lyu": "ゅ", "lyo": "ょ",
 
-  // z / j
+  // 2글자
+  "ka": "か", "ki": "き", "ku": "く", "ke": "け", "ko": "こ",
+  "sa": "さ", "si": "し", "shi": "し", "su": "す", "se": "せ", "so": "そ",
+  "ta": "た", "ti": "ち", "chi": "ち", "tu": "つ", "te": "て", "to": "と",
+  "na": "な", "ni": "に", "nu": "ぬ", "ne": "ね", "no": "の",
+  "nn": "ん", "xn": "ん",
+  "ha": "は", "hi": "ひ", "hu": "ふ", "fu": "ふ", "he": "へ", "ho": "ほ",
+  "fa": "ふぁ", "fi": "ふぃ", "fe": "ふぇ", "fo": "ふぉ",
+  "ma": "ま", "mi": "み", "mu": "む", "me": "め", "mo": "も",
+  "ya": "や", "yu": "ゆ", "yo": "よ",
+  "ra": "ら", "ri": "り", "ru": "る", "re": "れ", "ro": "ろ",
+  "wa": "わ", "wo": "を",
+  "ga": "が", "gi": "ぎ", "gu": "ぐ", "ge": "げ", "go": "ご",
   "za": "ざ", "zi": "じ", "ji": "じ", "zu": "ず", "ze": "ぜ", "zo": "ぞ",
   "ja": "じゃ", "ju": "じゅ", "jo": "じょ",
-  "zya": "じゃ", "zyu": "じゅ", "zyo": "じょ",
-
-  // d
   "da": "だ", "di": "ぢ", "du": "づ", "de": "で", "do": "ど",
-  "dya": "ぢゃ", "dyu": "ぢゅ", "dyo": "ぢょ",
-
-  // b
   "ba": "ば", "bi": "び", "bu": "ぶ", "be": "べ", "bo": "ぼ",
-  "bya": "びゃ", "byu": "びゅ", "byo": "びょ",
-
-  // p
   "pa": "ぱ", "pi": "ぴ", "pu": "ぷ", "pe": "ぺ", "po": "ぽ",
-  "pya": "ぴゃ", "pyu": "ぴゅ", "pyo": "ぴょ",
-
-  // 소문자 / 특수
   "xa": "ぁ", "xi": "ぃ", "xu": "ぅ", "xe": "ぇ", "xo": "ぉ",
-  "xtu": "っ", "xtsu": "っ", "xya": "ゃ", "xyu": "ゅ", "xyo": "ょ",
   "la": "ぁ", "li": "ぃ", "lu": "ぅ", "le": "ぇ", "lo": "ぉ",
-  "ltu": "っ", "ltsu": "っ", "lya": "ゃ", "lyu": "ゅ", "lyo": "ょ",
-  "-": "ー"
+  "-": "ー",
+
+  // 1글자
+  "a": "あ", "i": "い", "u": "う", "e": "え", "o": "お"
 };
 
 /**
- * 특정 가타카나 단어 자동 치환 맵
- * (학생들이 로마자로 입력하더라도 교과서 CSV의 가타카나 단어는 자동으로 가타카나로 변환)
+ * 텍스트 내의 알파벳 로마자를 히라가나로 변환하는 순수 변환 함수
  */
-var KATAKANA_AUTO_CONVERT = [
-  { kana: "じゅーす", kata: "ジュース" },
-  { kana: "じゅうす", kata: "ジュース" },
-  { kana: "こーら", kata: "コーラ" },
-  { kana: "かれー", kata: "カレー" },
-  { kana: "しう", kata: "シウ" },
-  { kana: "ぱり", kata: "パリ" }
-];
+function convertRomajiTextToHiragana(text) {
+  var result = "";
+  var i = 0;
+  var len = text.length;
 
-/**
- * 텍스트 내의 특정 단어를 가타카나로 자동 교정
- */
-function applySpecificKatakana(text) {
-  var res = text;
-  KATAKANA_AUTO_CONVERT.forEach(function(item) {
-    res = res.split(item.kana).join(item.kata);
-  });
-  return res;
+  while (i < len) {
+    var ch = text[i];
+    var chLower = ch.toLowerCase();
+
+    // 영문 알파벳이 아니면 그대로 통과
+    if (!/^[a-z\-]$/.test(chLower)) {
+      result += ch;
+      i++;
+      continue;
+    }
+
+    // 촉음 체크: 같은 자음 2연속 (예: tt -> っt, kk -> っk) (단, nn, aeiouwn 제외)
+    if (i + 1 < len) {
+      var nextCh = text[i + 1].toLowerCase();
+      if (chLower === nextCh && !"aeiouwn-".includes(chLower)) {
+        result += "っ";
+        i++;
+        continue;
+      }
+    }
+
+    // 4글자, 3글자, 2글자, 1글자 매칭 시도
+    var matched = false;
+    for (var l = Math.min(4, len - i); l >= 1; l--) {
+      var sub = text.substring(i, i + l).toLowerCase();
+      if (ROMAJI_TABLE[sub]) {
+        result += ROMAJI_TABLE[sub];
+        i += l;
+        matched = true;
+        break;
+      }
+    }
+
+    if (matched) continue;
+
+    // n 뒤에 자음이 오는 경우 (단, 모음 a,i,u,e,o,y 제외) -> ん
+    if (chLower === 'n' && i + 1 < len) {
+      var nextCh2 = text[i + 1].toLowerCase();
+      if (!"aeiouy".includes(nextCh2)) {
+        result += "ん";
+        i++;
+        continue;
+      }
+    }
+
+    // 단어 끝의 n -> ん
+    if (chLower === 'n' && i === len - 1) {
+      result += "ん";
+      i++;
+      continue;
+    }
+
+    // 아직 완성되지 않은 알파벳은 일단 그대로 둠
+    result += ch;
+    i++;
+  }
+
+  return result;
 }
 
 /**
- * 3-4과 문장 CSV 데이터 목록 (정확한 문장 및 의미)
+ * 3-4과 문장 CSV 데이터 목록 (37문장)
  */
 var exactSentenceList = [
   { "sentence": "うどんに　します。", "mean": "우동으로 하겠습니다." },
@@ -143,132 +162,40 @@ var exactSentenceList = [
 var currentTypeSentence = null;
 var isTypeChecked = false;
 var typeSolved = 0;
-var romajiBuffer = "";
 
 /**
- * 로마자 버퍼 처리 및 입력창 반영
+ * 문장에서 가타카나 단어 추출 (유니코드 30A0-30FF 범위)
  */
-function processRomajiInput(inputEl) {
-  var buf = romajiBuffer;
-  var appended = "";
-
-  while (buf.length > 0) {
-    // 촉음 처리 (tt -> っt, kk -> っk)
-    if (buf.length >= 2 && buf[0] === buf[1] && !"aeiouwn".includes(buf[0])) {
-      appended += "っ";
-      buf = buf.substring(1);
-      continue;
-    }
-
-    // 최장 일치 검색
-    var matched = false;
-    for (var len = Math.min(buf.length, 4); len >= 1; len--) {
-      var prefix = buf.substring(0, len);
-      if (ROMAJI_TABLE[prefix]) {
-        appended += ROMAJI_TABLE[prefix];
-        buf = buf.substring(len);
-        matched = true;
-        break;
-      }
-    }
-
-    if (matched) continue;
-
-    // n + 자음 -> ん
-    if (buf.length >= 2 && buf[0] === 'n' && !"aeiouy".includes(buf[1])) {
-      appended += "ん";
-      buf = buf.substring(1);
-      continue;
-    }
-
-    break; // 아직 변환 불가능한 미완성 로마자는 버퍼에 유지
-  }
-
-  romajiBuffer = buf;
-
-  if (appended.length > 0) {
-    var start = inputEl.selectionStart || inputEl.value.length;
-    var end = inputEl.selectionEnd || inputEl.value.length;
-    var val = inputEl.value;
-
-    inputEl.value = val.substring(0, start) + appended + val.substring(end);
-    var newPos = start + appended.length;
-    inputEl.setSelectionRange(newPos, newPos);
-  }
-
-  // 가타카나 지정 단어 실시간 교정 적용
-  var corrected = applySpecificKatakana(inputEl.value);
-  if (corrected !== inputEl.value) {
-    var curPos = inputEl.selectionStart;
-    var diff = corrected.length - inputEl.value.length;
-    inputEl.value = corrected;
-    inputEl.setSelectionRange(curPos + diff, curPos + diff);
-  }
-
-  updateRomajiGuide();
+function extractKatakanaWords(sentence) {
+  var katakanaRegex = /[\u30A0-\u30FF]+/g;
+  var matches = sentence.match(katakanaRegex);
+  if (!matches) return [];
+  return Array.from(new Set(matches));
 }
 
 /**
- * 버퍼에 남은 미완성 로마자 강제 플러시
+ * 커서 위치에 가타카나 단어 삽입
  */
-function flushRomajiBuffer(inputEl) {
-  if (!inputEl) inputEl = document.getElementById('typeSentenceInput');
-  if (!inputEl) return;
+function insertKatakanaChip(kata) {
+  if (isTypeChecked) return;
+  var input = document.getElementById('typeSentenceInput');
+  if (!input) return;
 
-  var appended = "";
-  if (romajiBuffer === 'n') {
-    appended = "ん";
-  } else if (romajiBuffer.length > 0) {
-    if (ROMAJI_TABLE[romajiBuffer]) {
-      appended = ROMAJI_TABLE[romajiBuffer];
-    } else {
-      appended = romajiBuffer;
-    }
-  }
+  var start = input.selectionStart != null ? input.selectionStart : input.value.length;
+  var end = input.selectionEnd != null ? input.selectionEnd : input.value.length;
+  var val = input.value;
 
-  romajiBuffer = "";
-
-  if (appended.length > 0) {
-    var start = inputEl.selectionStart || inputEl.value.length;
-    var end = inputEl.selectionEnd || inputEl.value.length;
-    var val = inputEl.value;
-
-    inputEl.value = val.substring(0, start) + appended + val.substring(end);
-    var newPos = start + appended.length;
-    inputEl.setSelectionRange(newPos, newPos);
-  }
-
-  var corrected = applySpecificKatakana(inputEl.value);
-  if (corrected !== inputEl.value) {
-    inputEl.value = corrected;
-  }
-
-  updateRomajiGuide();
+  input.value = val.substring(0, start) + kata + val.substring(end);
+  var newPos = start + kata.length;
+  input.setSelectionRange(newPos, newPos);
+  input.focus();
 }
 
 /**
- * 로마자 조합 중 상태 표시
- */
-function updateRomajiGuide() {
-  var guide = document.getElementById('romajiPending');
-  if (guide) {
-    if (romajiBuffer) {
-      guide.innerText = "입력 중: " + romajiBuffer;
-      guide.style.display = "inline-block";
-    } else {
-      guide.innerText = "";
-      guide.style.display = "none";
-    }
-  }
-}
-
-/**
- * 전체 지우기
+ * 입력창 전체 지우기 기능 (완전 복구)
  */
 function clearTypeInput() {
   if (isTypeChecked) return;
-  romajiBuffer = "";
-  updateRomajiGuide();
   var input = document.getElementById('typeSentenceInput');
   if (!input) return;
   input.value = '';
@@ -276,7 +203,7 @@ function clearTypeInput() {
 }
 
 /**
- * 다음 문제 출제 (3-4과 문장 CSV 풀에서 무작위 선택)
+ * 다음 문제 출제
  */
 function nextTypeSentence() {
   if (!exactSentenceList || exactSentenceList.length === 0) {
@@ -285,9 +212,6 @@ function nextTypeSentence() {
   }
 
   isTypeChecked = false;
-  romajiBuffer = "";
-  updateRomajiGuide();
-
   document.getElementById('typeFeedback').innerText = '';
   document.getElementById('btnNextType').disabled = true;
   document.getElementById('btnCheckType').disabled = false;
@@ -303,22 +227,42 @@ function nextTypeSentence() {
   document.getElementById('typeCount').innerText = typeSolved;
   document.getElementById('typeKoreanHint').innerText = currentTypeSentence.mean;
 
+  // 문장 하단에 가타카나 단어 칩 목록 표시
+  var kataBox = document.getElementById('katakanaBoxBottom');
+  var kataShelf = document.getElementById('katakanaShelfBottom');
+  kataShelf.innerHTML = '';
+
+  var kataList = extractKatakanaWords(currentTypeSentence.sentence);
+  if (kataList.length > 0) {
+    kataBox.style.display = 'block';
+    kataList.forEach(function(kata) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'katakana-chip';
+      btn.innerText = kata;
+      btn.title = '클릭하면 커서 위치에 단어가 삽입됩니다';
+      btn.onclick = function() {
+        insertKatakanaChip(kata);
+      };
+      kataShelf.appendChild(btn);
+    });
+  } else {
+    kataBox.style.display = 'none';
+  }
+
   setTimeout(function() {
     if (input) input.focus();
   }, 100);
 }
 
 /**
- * 정답 비교 시 불필요한 차이 정규화 함수
- * - 전각/반각 공백 통일
- * - 일본어 물결표(～)와 일반 물결표(~) 통일
- * - 마침표/쉼표/물음표/느낌표 전각 통일
+ * 정답 비교 시 불필요한 차이 정규화
  */
 function normalizeSentence(str) {
   if (!str) return "";
   return str
     .trim()
-    .replace(/\s+/g, '') // 공백 제거 비교 (또는 동일 띄어쓰기)
+    .replace(/\s+/g, '') // 공백 유연화
     .replace(/~/g, '～')
     .replace(/\./g, '。')
     .replace(/,/g, '、')
@@ -327,14 +271,17 @@ function normalizeSentence(str) {
 }
 
 /**
- * 정답 확인 (CSV 원본 문장과 엄격하게 대조)
+ * 정답 확인
  */
 function checkTypeSentence() {
   if (isTypeChecked) return;
   var input = document.getElementById('typeSentenceInput');
-  flushRomajiBuffer(input);
+  if (!input) return;
 
-  var userText = (input ? input.value : "").trim();
+  // 마지막 미변환 n 처리 (예: udon -> うどん)
+  input.value = convertRomajiTextToHiragana(input.value);
+
+  var userText = input.value.trim();
   var feedback = document.getElementById('typeFeedback');
 
   if (!userText) {
@@ -346,7 +293,7 @@ function checkTypeSentence() {
   isTypeChecked = true;
   document.getElementById('btnCheckType').disabled = true;
   document.getElementById('btnNextType').disabled = false;
-  if (input) input.readOnly = true;
+  input.readOnly = true;
 
   var exactTarget = currentTypeSentence.sentence;
   var normUser = normalizeSentence(userText);
@@ -364,105 +311,42 @@ function checkTypeSentence() {
 }
 
 /**
- * 키보드 이벤트 리스너 등록 (디바이스 실제 키보드 연동)
+ * 입력창 이벤트 리스너 등록
+ * (중간 커서 클릭, 선택 영역 치환, 중간 타자 삽입 완벽 지원)
  */
 document.addEventListener('DOMContentLoaded', function() {
   var input = document.getElementById('typeSentenceInput');
   if (input) {
-    // 키 다운 이벤트
+    // 키보드 엔터 키 시 정답 확인
     input.addEventListener('keydown', function(e) {
-      if (isTypeChecked) return;
-
-      // 1. 알파벳 (a-z, A-Z, -)
-      if (/^[a-zA-Z\-]$/.test(e.key)) {
-        e.preventDefault();
-        romajiBuffer += e.key.toLowerCase();
-        processRomajiInput(input);
-        return;
-      }
-
-      // 2. 온점 '.' 입력 시 일본어 온점 '。'로 자동 변환
-      if (e.key === '.') {
-        e.preventDefault();
-        flushRomajiBuffer(input);
-        var start = input.selectionStart;
-        var end = input.selectionEnd;
-        input.value = input.value.substring(0, start) + '。' + input.value.substring(end);
-        input.setSelectionRange(start + 1, start + 1);
-        return;
-      }
-
-      // 3. 쉼표 ',' 입력 시 일본어 쉼표 '、'로 자동 변환
-      if (e.key === ',') {
-        e.preventDefault();
-        flushRomajiBuffer(input);
-        var start = input.selectionStart;
-        var end = input.selectionEnd;
-        input.value = input.value.substring(0, start) + '、' + input.value.substring(end);
-        input.setSelectionRange(start + 1, start + 1);
-        return;
-      }
-
-      // 4. 물음표 '?' / 느낌표 '!' 입력 시 전각 변환
-      if (e.key === '?') {
-        e.preventDefault();
-        flushRomajiBuffer(input);
-        var start = input.selectionStart;
-        var end = input.selectionEnd;
-        input.value = input.value.substring(0, start) + '？' + input.value.substring(end);
-        input.setSelectionRange(start + 1, start + 1);
-        return;
-      }
-      if (e.key === '!') {
-        e.preventDefault();
-        flushRomajiBuffer(input);
-        var start = input.selectionStart;
-        var end = input.selectionEnd;
-        input.value = input.value.substring(0, start) + '！' + input.value.substring(end);
-        input.setSelectionRange(start + 1, start + 1);
-        return;
-      }
-
-      // 5. 백스페이스
-      if (e.key === 'Backspace') {
-        if (romajiBuffer.length > 0) {
-          e.preventDefault();
-          romajiBuffer = romajiBuffer.substring(0, romajiBuffer.length - 1);
-          updateRomajiGuide();
-        }
-        return;
-      }
-
-      // 6. 스페이스바 (공백)
-      if (e.key === ' ' || e.key === 'Spacebar') {
-        flushRomajiBuffer(input);
-        return;
-      }
-
-      // 7. 엔터 (정답 확인)
       if (e.key === 'Enter') {
         e.preventDefault();
         checkTypeSentence();
-        return;
       }
     });
 
-    // 모바일 등 가상 키패드 또는 붙여넣기 input 이벤트 대응
+    // input 이벤트: 디바이스 실제 입력(타이핑, 붙여넣기 등)을 감지하여 커서 위치 보존하며 변환
     input.addEventListener('input', function(e) {
       if (isTypeChecked) return;
-      var curVal = input.value;
-      // 온점 마침표가 들어간 경우 '。'로 치환
-      if (curVal.indexOf('.') !== -1) {
-        var pos = input.selectionStart;
-        input.value = curVal.split('.').join('。');
-        input.setSelectionRange(pos, pos);
-      }
-      // 가타카나 자동 변환
-      var corrected = applySpecificKatakana(input.value);
-      if (corrected !== input.value) {
-        var pos = input.selectionStart;
-        input.value = corrected;
-        input.setSelectionRange(pos, pos);
+
+      var oldVal = input.value;
+      var curPos = input.selectionStart;
+
+      // 1. 온점 '.' 입력 시 일본어 온점 '。'로 변환
+      var converted = oldVal.replace(/\./g, '。');
+
+      // 2. 쉼표 ',' 입력 시 일본어 쉼표 '、'로 변환
+      converted = converted.replace(/,/g, '、');
+
+      // 3. 로마자 -> 히라가나 변환
+      converted = convertRomajiTextToHiragana(converted);
+
+      if (converted !== oldVal) {
+        // 커서 위치 보정: 변환 전후 글자 수 차이만큼 이동
+        var lengthDiff = converted.length - oldVal.length;
+        input.value = converted;
+        var newPos = Math.max(0, curPos + lengthDiff);
+        input.setSelectionRange(newPos, newPos);
       }
     });
   }
