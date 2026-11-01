@@ -14,29 +14,8 @@ var wordSolved = 0;
 var wordScore = 0;
 var sentSolved = 0;
 
-// 문장 블록 나열 퀴즈 잠금 해제 여부 (세션 동안 유지)
-var isSentenceUnlocked = false;
-
-/**
- * 문장 블록 나열 퀴즈 비밀번호 검증 및 잠금 해제
- */
-function unlockSentenceQuiz() {
-  var inputEl = document.getElementById('sentPwInput');
-  var input = inputEl.value.trim();
-  var err = document.getElementById('sentLockError');
-
-  if (input === SENTENCE_PW) {
-    isSentenceUnlocked = true;
-    err.innerText = "";
-    document.getElementById('sentLockBox').style.display = 'none';
-    document.getElementById('sentQuizContent').style.display = 'block';
-    nextSentence();
-  } else {
-    err.innerText = "❌ 비밀번호가 올바르지 않습니다.";
-    inputEl.value = '';
-    inputEl.focus();
-  }
-}
+// 문장 블록 나열 퀴즈 잠금 해제 여부 (비밀번호 없이 즉시 공개)
+var isSentenceUnlocked = true;
 
 /**
  * 일본어 발음 음성 출력 (Web Speech API)
@@ -71,19 +50,8 @@ function changeMode(mode) {
   if (mode === 'word') {
     if (!currentWord) nextWord();
   } else if (mode === 'sentence') {
-    // 문장 퀴즈는 비밀번호가 해제되어 있어야만 문제 화면 표시
-    if (isSentenceUnlocked) {
-      document.getElementById('sentLockBox').style.display = 'none';
-      document.getElementById('sentQuizContent').style.display = 'block';
-      if (!currentSentence) nextSentence();
-    } else {
-      document.getElementById('sentLockBox').style.display = 'block';
-      document.getElementById('sentQuizContent').style.display = 'none';
-      setTimeout(function() {
-        var pwInput = document.getElementById('sentPwInput');
-        if (pwInput) pwInput.focus();
-      }, 50);
-    }
+    // 문장 퀴즈는 비밀번호 없이 바로 시작
+    if (!currentSentence) nextSentence();
   } else if (mode === 'typing') {
     if (!currentTypeSentence) nextTypeSentence();
   }

@@ -57,45 +57,27 @@
     </div>
 
     <!-- 2. 문장 블록 나열 영역 -->
-    <div id="sentQuizArea" style="display: none;">
-      
-      <!-- 문장 블록 전용 잠금 게이트 카드 -->
-      <div id="sentLockBox" class="quiz-box">
-        <div class="lock-card">
-          <div class="lock-icon">🔒</div>
-          <div class="lock-title">문장 블록 나열 퀴즈</div>
-          <div class="lock-desc">이 기능은 비밀번호를 입력해야 입장할 수 있습니다.</div>
-          <input type="password" id="sentPwInput" class="pw-input" placeholder="비밀번호 입력" onkeyup="if(window.event.keyCode==13){unlockSentenceQuiz();}">
-          <br>
-          <button class="lock-btn" onclick="unlockSentenceQuiz()">입장하기</button>
-          <div class="lock-error" id="sentLockError"></div>
-        </div>
+    <div id="sentQuizArea" class="quiz-box" style="display: none;">
+      <div class="info-header">
+        <span style="color:var(--board-green); font-weight:800;">🧩 문장 랜덤 퀴즈</span>
+        <span>진행 문제 <b id="sentCount">0</b></span>
       </div>
 
-      <!-- 문장 퀴즈 실제 문제 풀이 본체 -->
-      <div id="sentQuizContent" class="quiz-box" style="display: none;">
-        <div class="info-header">
-          <span style="color:var(--board-green); font-weight:800;">🧩 문장 랜덤 퀴즈</span>
-          <span>진행 문제 <b id="sentCount">0</b></span>
-        </div>
+      <div class="korean-hint" id="targetKorean">한국어 뜻이 표시됩니다</div>
 
-        <div class="korean-hint" id="targetKorean">한국어 뜻이 표시됩니다</div>
+      <div class="section-label">만든 문장 (터치하면 아래로 돌아갑니다):</div>
+      <div class="answer-tray" id="answerTray"></div>
 
-        <div class="section-label">만든 문장 (터치하면 아래로 돌아갑니다):</div>
-        <div class="answer-tray" id="answerTray"></div>
+      <div class="section-label">단어 블록을 순서대로 터치하세요:</div>
+      <div class="block-shelf" id="blockShelf"></div>
 
-        <div class="section-label">단어 블록을 순서대로 터치하세요:</div>
-        <div class="block-shelf" id="blockShelf"></div>
+      <div class="feedback-text" id="sentFeedback"></div>
 
-        <div class="feedback-text" id="sentFeedback"></div>
-
-        <div class="button-group">
-          <button class="action-btn btn-check" onclick="resetSentenceBlocks()">다시 놓기</button>
-          <button class="action-btn btn-check" id="btnCheckSent" onclick="checkSentence()">정답 확인</button>
-          <button class="action-btn btn-next" id="btnNextSent" onclick="nextSentence()" disabled>다음 문제 ➔</button>
-        </div>
+      <div class="button-group">
+        <button class="action-btn btn-check" onclick="resetSentenceBlocks()">다시 놓기</button>
+        <button class="action-btn btn-check" id="btnCheckSent" onclick="checkSentence()">정답 확인</button>
+        <button class="action-btn btn-next" id="btnNextSent" onclick="nextSentence()" disabled>다음 문제 ➔</button>
       </div>
-
     </div>
 
   </div>
