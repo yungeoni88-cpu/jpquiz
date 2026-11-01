@@ -55,22 +55,22 @@ function speak(text) {
 }
 
 /**
- * 퀴즈 모드 전환 (단어 맞히기 / 문장 블록 나열)
- * @param {string} mode - 'word' 또는 'sentence'
+ * 퀴즈 모드 전환 (단어 맞히기 / 문장 블록 나열 / 직접 입력 완성)
+ * @param {string} mode - 'word', 'sentence', 'typing'
  */
 function changeMode(mode) {
   currentMode = mode;
   document.getElementById('btnTabWord').className = (mode === 'word') ? 'tab-btn active' : 'tab-btn';
   document.getElementById('btnTabSent').className = (mode === 'sentence') ? 'tab-btn active' : 'tab-btn';
+  document.getElementById('btnTabType').className = (mode === 'typing') ? 'tab-btn active' : 'tab-btn';
+
+  document.getElementById('wordQuizArea').style.display = (mode === 'word') ? 'block' : 'none';
+  document.getElementById('sentQuizArea').style.display = (mode === 'sentence') ? 'block' : 'none';
+  document.getElementById('typeQuizArea').style.display = (mode === 'typing') ? 'block' : 'none';
 
   if (mode === 'word') {
-    document.getElementById('wordQuizArea').style.display = 'block';
-    document.getElementById('sentQuizArea').style.display = 'none';
     if (!currentWord) nextWord();
-  } else {
-    document.getElementById('wordQuizArea').style.display = 'none';
-    document.getElementById('sentQuizArea').style.display = 'block';
-
+  } else if (mode === 'sentence') {
     // 문장 퀴즈는 비밀번호가 해제되어 있어야만 문제 화면 표시
     if (isSentenceUnlocked) {
       document.getElementById('sentLockBox').style.display = 'none';
@@ -84,6 +84,8 @@ function changeMode(mode) {
         if (pwInput) pwInput.focus();
       }, 50);
     }
+  } else if (mode === 'typing') {
+    if (!currentTypeSentence) nextTypeSentence();
   }
 }
 

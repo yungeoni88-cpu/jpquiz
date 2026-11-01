@@ -29,8 +29,9 @@
     </header>
 
     <div class="tab-container">
-      <button class="tab-btn active" id="btnTabWord" onclick="changeMode('word')">💡 단어 뜻 맞히기</button>
-      <button class="tab-btn" id="btnTabSent" onclick="changeMode('sentence')">🧩 문장 블록 나열</button>
+      <button class="tab-btn active" id="btnTabWord" onclick="changeMode('word')">💡 단어 뜻</button>
+      <button class="tab-btn" id="btnTabSent" onclick="changeMode('sentence')">🧩 블록 나열</button>
+      <button class="tab-btn" id="btnTabType" onclick="changeMode('typing')">⌨️ 문장 입력</button>
     </div>
 
     <!-- 1. 단어 맞히기 (기본 공개) -->
@@ -98,6 +99,56 @@
 
     </div>
 
+    <!-- 3. 문장 직접 입력 완성 영역 (가상 키보드 + 가타카나 블록) -->
+    <div id="typeQuizArea" class="quiz-box" style="display: none;">
+      <div class="info-header">
+        <span style="color:var(--board-green); font-weight:800;">⌨️ 문장 입력 완성 퀴즈</span>
+        <span>진행 문제 <b id="typeCount">0</b></span>
+      </div>
+
+      <div class="korean-hint" id="typeKoreanHint">한국어 뜻이 표시됩니다</div>
+
+      <!-- 가타카나 칩 보관함 (가타카나가 있는 경우에만 표시) -->
+      <div id="katakanaBox" style="display: none;">
+        <div class="section-label">🏷️ 가타카나 단어 (클릭하여 입력칸에 추가):</div>
+        <div class="katakana-shelf" id="katakanaShelf"></div>
+      </div>
+
+      <div class="section-label">✍️ 입력한 일본어 문장:</div>
+      <div class="type-input-area">
+        <input type="text" id="typeSentenceInput" class="type-input" placeholder="아래 키보드로 히라가나를 입력하세요" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button type="button" class="type-clear-btn" onclick="clearTypeInput()" title="입력창 전체 지우기">지우기</button>
+      </div>
+
+      <!-- 화면 가상 키보드 (오십음도 줄별) -->
+      <div class="virtual-keyboard">
+        <div class="section-label" style="margin-bottom: 4px;">가상 키보드 (행 선택 후 글자 터치):</div>
+        
+        <!-- 오십음도 행 선택 탭 -->
+        <div class="vk-row-tabs" id="vkRowTabs"></div>
+
+        <!-- 글자 키 버튼 -->
+        <div class="vk-char-keys" id="vkCharKeys"></div>
+
+        <!-- 보조 기능 키 (공백, 기호, 한 글자 삭제) -->
+        <div class="vk-action-bar">
+          <button type="button" class="vk-fn-key" onclick="insertChar('、')">、</button>
+          <button type="button" class="vk-fn-key" onclick="insertChar('。')">。</button>
+          <button type="button" class="vk-fn-key" onclick="insertChar('？')">？</button>
+          <button type="button" class="vk-fn-key" onclick="insertChar('！')">！</button>
+          <button type="button" class="vk-fn-key space" onclick="insertChar(' ')">띄어쓰기</button>
+          <button type="button" class="vk-fn-key backspace" onclick="deleteLastChar()">⌫ 지움</button>
+        </div>
+      </div>
+
+      <div class="feedback-text" id="typeFeedback"></div>
+
+      <div class="button-group">
+        <button class="action-btn btn-check" id="btnCheckType" onclick="checkTypeSentence()">정답 확인</button>
+        <button class="action-btn btn-next" id="btnNextType" onclick="nextTypeSentence()" disabled>다음 문제 ➔</button>
+      </div>
+    </div>
+
   </div>
 
 </div>
@@ -107,6 +158,7 @@
 <script src="js/app.js"></script>
 <script src="js/word-quiz.js"></script>
 <script src="js/sentence-quiz.js"></script>
+<script src="js/typing-quiz.js"></script>
 
 </body>
 </html>
