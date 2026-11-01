@@ -1,5 +1,5 @@
 /**
- * 로마자 -> 히라가나 자동 변환 테이블 (Hepburn / Kunrei 호환)
+ * 로마자 -> 히라가나 매핑 테이블
  */
 var ROMAJI_TABLE = {
   // 모음
@@ -37,7 +37,8 @@ var ROMAJI_TABLE = {
   "ya": "や", "yu": "ゆ", "yo": "よ",
 
   // r
-  "ra": "ら", "ri": "り", "ru": "る", "re": "れ", "ro": "ろ",
+  "ra": "ら", "ri": "り", "ru": "る", "re": "레", "ro": "ろ",
+  "re": "れ",
   "rya": "りゃ", "ryu": "りゅ", "ryo": "りょ",
 
   // w
@@ -64,154 +65,185 @@ var ROMAJI_TABLE = {
   "pa": "ぱ", "pi": "ぴ", "pu": "ぷ", "pe": "ぺ", "po": "ぽ",
   "pya": "ぴゃ", "pyu": "ぴゅ", "pyo": "ぴょ",
 
-  // 소문자/특수 (x 또는 l 접두사)
+  // 소문자 / 특수
   "xa": "ぁ", "xi": "ぃ", "xu": "ぅ", "xe": "ぇ", "xo": "ぉ",
   "xtu": "っ", "xtsu": "っ", "xya": "ゃ", "xyu": "ゅ", "xyo": "ょ",
   "la": "ぁ", "li": "ぃ", "lu": "ぅ", "le": "ぇ", "lo": "ぉ",
   "ltu": "っ", "ltsu": "っ", "lya": "ゃ", "lyu": "ゅ", "lyo": "ょ",
-  "-" : "ー"
+  "-": "ー"
 };
 
 /**
- * 직접 입력 문장 완성 퀴즈 로직 (QWERTY 가상 키보드 + 로마자 히라가나 자동 변환)
+ * 특정 가타카나 단어 자동 치환 맵
+ * (학생들이 로마자로 입력하더라도 교과서 CSV의 가타카나 단어는 자동으로 가타카나로 변환)
  */
-var currentTypeSentence = null;
-var isTypeChecked = false;
-var typeSolved = 0;
-var romajiBuffer = ""; // 변환 대기 중인 로마자 버퍼
-
-// QWERTY 가상 키보드 레이아웃
-var QWERTY_ROWS = [
-  ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
-  ["a", "s", "d", "f", "g", "h", "j", "k", "l", "-"],
-  ["z", "x", "c", "v", "b", "n", "m", "、", "。"]
+var KATAKANA_AUTO_CONVERT = [
+  { kana: "じゅーす", kata: "ジュース" },
+  { kana: "じゅうす", kata: "ジュース" },
+  { kana: "こーら", kata: "コーラ" },
+  { kana: "かれー", kata: "カレー" },
+  { kana: "しう", kata: "シウ" },
+  { kana: "ぱり", kata: "パリ" }
 ];
 
 /**
- * 가상 키보드 렌더링
+ * 텍스트 내의 특정 단어를 가타카나로 자동 교정
  */
-function initVirtualKeyboard() {
-  var container = document.getElementById('vkQwertyRows');
-  if (!container) return;
-  container.innerHTML = '';
-
-  QWERTY_ROWS.forEach(function(rowKeys) {
-    var rowDiv = document.createElement('div');
-    rowDiv.className = 'qwerty-row';
-
-    rowKeys.forEach(function(k) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'qwerty-key';
-      btn.innerText = k;
-      btn.onclick = function() {
-        handleKeyInput(k);
-      };
-      rowDiv.appendChild(btn);
-    });
-
-    container.appendChild(rowDiv);
+function applySpecificKatakana(text) {
+  var res = text;
+  KATAKANA_AUTO_CONVERT.forEach(function(item) {
+    res = res.split(item.kana).join(item.kata);
   });
+  return res;
 }
 
 /**
- * 키 입력 처리 (QWERTY 키 터치 또는 물리 키보드 입력 공통 처리)
+ * 3-4과 문장 CSV 데이터 목록 (정확한 문장 및 의미)
  */
-function handleKeyInput(char) {
-  if (isTypeChecked) return;
-  var input = document.getElementById('typeSentenceInput');
-  if (!input) return;
+var exactSentenceList = [
+  { "sentence": "うどんに　します。", "mean": "우동으로 하겠습니다." },
+  { "sentence": "じゅぎょうは　なんじからですか。", "mean": "수업은 몇시부터 입니까?" },
+  { "sentence": "くじからです", "mean": "9시부터입니다." },
+  { "sentence": "たなかさん、なにに　しますか。", "mean": "다나카씨, 무엇으로 하시겠습니까?" },
+  { "sentence": "カレーと　ジュースに　します。", "mean": "카레와 주스로 하겠습니다." },
+  { "sentence": "そばの　ほうが　おいしいです。", "mean": "메밀국수 쪽이 (더) 맛있어요." },
+  { "sentence": "えいごと　すうがくと　どちらが　むずかしいですか。", "mean": "영어와 수학 중에 어느 쪽이 어렵습니까?" },
+  { "sentence": "すうがくの　ほうが　むずかしいです。", "mean": "수학 쪽이 (더) 어렵습니다." },
+  { "sentence": "パリの　なつは　あついですか。", "mean": "파리의 여름은 덥습니까?" },
+  { "sentence": "いいえ、あまり　あつくないです。", "mean": "아니요, 그다지 덥지 않습니다." },
+  { "sentence": "あした、おひる　いっしょに　どう？", "mean": "내일, 점심 같이 어때?" },
+  { "sentence": "いいよ！", "mean": "좋아!" },
+  { "sentence": "この　おみせ、やすくて　おいしいよ。", "mean": "이 가게, 싸고 맛있어" },
+  { "sentence": "いいね。カレーと　てんぷら、どっちが　おいしいかな。", "mean": "좋네. 카레와 튀김, 어느쪽이 맛있을까?" },
+  { "sentence": "この　みせ、カレーうどんが　にんきだよ。", "mean": "이 가게는 카레우동이 인기야." },
+  { "sentence": "じゃあ、カレーうどんに　する。", "mean": "그럼, 카레우동으로 할게." },
+  { "sentence": "わたしも～", "mean": "나도~" },
+  { "sentence": "ぼくは　てんぷらうどんに　するよ。", "mean": "나는 튀김우동으로 할게." },
+  { "sentence": "うどんに　カレーは　ちょっと", "mean": "우동에 카레는 좀..." },
+  { "sentence": "じゃあ、あした 12じに　がっこうの　まえで。", "mean": "그럼, 내일 12시에 학교 앞에서." },
+  { "sentence": "は～い。", "mean": "네~" },
+  { "sentence": "とても　きれいです。", "mean": "매우 예쁘다." },
+  { "sentence": "田中さん、のみものでは　何が　好きですか。", "mean": "다나카씨는 음료중에서 무엇을 좋아합니까?" },
+  { "sentence": "コーラが　好きです。", "mean": "콜라를 좋아합니다." },
+  { "sentence": "あの　おんせんは　どうですか。", "mean": "저 온천은 어때요?" },
+  { "sentence": "とても　ゆうめいです。", "mean": "매우 유명합니다." },
+  { "sentence": "あまり　ゆうめいじゃ　ありません", "mean": "그다지 유명하지 않습니다." },
+  { "sentence": "にぎやかだね。", "mean": "번화하네." },
+  { "sentence": "うん。だいこくの　人も　おおいね。", "mean": "응. 외국인도 많네." },
+  { "sentence": "あの　ふね、いくらかな。", "mean": "저 배는 얼마일까?" },
+  { "sentence": "ええと、ひとり 900円。", "mean": "음, 한 사람에 900엔." },
+  { "sentence": "シウ君は　日本の　どんな　たべものが　好き？", "mean": "시우 군은 일본의 어떤 음식을 좋아해?" },
+  { "sentence": "たこやきが　いちばん　好き。", "mean": "타코야끼를 가장 좋아해." },
+  { "sentence": "すみません。これ、ふたつ　ください。", "mean": "실례합니다. 이거, 두 개 주세요." },
+  { "sentence": "はい、ふたつですね。1200円です。", "mean": "네, 두 개네요. 1200엔입니다." },
+  { "sentence": "わあ、すごく　おいしい！", "mean": "와, 정말 맛있어!" },
+  { "sentence": "わあ、はやい。おもしろいね。", "mean": "와, 빠르다. 재미있네" }
+];
 
-  var lower = char.toLowerCase();
-
-  // 구두점이나 기호인 경우 버퍼 플러시 후 그대로 추가
-  if (lower === '、' || lower === '。' || lower === '?' || lower === '!' || lower === '？' || lower === '！') {
-    flushRomajiBuffer();
-    appendStringToInput(lower === '?' ? '？' : (lower === '!' ? '！' : lower));
-    return;
-  }
-
-  // 특수 장음 부호
-  if (lower === '-') {
-    flushRomajiBuffer();
-    appendStringToInput('ー');
-    return;
-  }
-
-  // 자음/모음 로마자 추가
-  romajiBuffer += lower;
-  processRomajiBuffer();
-}
+var currentTypeSentence = null;
+var isTypeChecked = false;
+var typeSolved = 0;
+var romajiBuffer = "";
 
 /**
- * 로마자 버퍼 -> 히라가나 변환 로직
+ * 로마자 버퍼 처리 및 입력창 반영
  */
-function processRomajiBuffer() {
+function processRomajiInput(inputEl) {
   var buf = romajiBuffer;
+  var appended = "";
 
-  // 1. 촉음 처리: 자음 2개 연속 (단, 'nn'은 제외)
-  // 예: "tt" -> "っ" + "t", "kk" -> "っ" + "k", "ss" -> "っ" + "s"
-  if (buf.length >= 2 && buf[0] === buf[1] && !"aeiouwn".includes(buf[0])) {
-    appendStringToInput("っ");
-    romajiBuffer = buf.substring(1);
-    buf = romajiBuffer;
-  }
-
-  // 2. 긴 조합부터 테이블 매칭 시도 (예: kya, sha, chi, tsu ...)
-  for (var len = Math.min(buf.length, 4); len >= 1; len--) {
-    var prefix = buf.substring(0, len);
-    if (ROMAJI_TABLE[prefix]) {
-      appendStringToInput(ROMAJI_TABLE[prefix]);
-      romajiBuffer = buf.substring(len);
-      updateRomajiGuide();
-      return;
+  while (buf.length > 0) {
+    // 촉음 처리 (tt -> っt, kk -> っk)
+    if (buf.length >= 2 && buf[0] === buf[1] && !"aeiouwn".includes(buf[0])) {
+      appended += "っ";
+      buf = buf.substring(1);
+      continue;
     }
+
+    // 최장 일치 검색
+    var matched = false;
+    for (var len = Math.min(buf.length, 4); len >= 1; len--) {
+      var prefix = buf.substring(0, len);
+      if (ROMAJI_TABLE[prefix]) {
+        appended += ROMAJI_TABLE[prefix];
+        buf = buf.substring(len);
+        matched = true;
+        break;
+      }
+    }
+
+    if (matched) continue;
+
+    // n + 자음 -> ん
+    if (buf.length >= 2 && buf[0] === 'n' && !"aeiouy".includes(buf[1])) {
+      appended += "ん";
+      buf = buf.substring(1);
+      continue;
+    }
+
+    break; // 아직 변환 불가능한 미완성 로마자는 버퍼에 유지
   }
 
-  // 3. n 처리: n 뒤에 자음이 오거나 단어 끝일 때 'ん'
-  // (모음 a, i, u, e, o, y가 아닌 자음이 붙었을 경우 앞 n은 'ん')
-  if (buf.length >= 2 && buf[0] === 'n' && !"aeiouy".includes(buf[1])) {
-    appendStringToInput("ん");
-    romajiBuffer = buf.substring(1);
-    processRomajiBuffer();
-    return;
+  romajiBuffer = buf;
+
+  if (appended.length > 0) {
+    var start = inputEl.selectionStart || inputEl.value.length;
+    var end = inputEl.selectionEnd || inputEl.value.length;
+    var val = inputEl.value;
+
+    inputEl.value = val.substring(0, start) + appended + val.substring(end);
+    var newPos = start + appended.length;
+    inputEl.setSelectionRange(newPos, newPos);
   }
 
-  // 아직 완성되지 않은 조합 (예: 'k', 'sh')은 가이드에 표시
+  // 가타카나 지정 단어 실시간 교정 적용
+  var corrected = applySpecificKatakana(inputEl.value);
+  if (corrected !== inputEl.value) {
+    var curPos = inputEl.selectionStart;
+    var diff = corrected.length - inputEl.value.length;
+    inputEl.value = corrected;
+    inputEl.setSelectionRange(curPos + diff, curPos + diff);
+  }
+
   updateRomajiGuide();
 }
 
 /**
- * 버퍼에 남은 로마자 강제 플러시 (공백/체크 시 호출)
+ * 버퍼에 남은 미완성 로마자 강제 플러시
  */
-function flushRomajiBuffer() {
+function flushRomajiBuffer(inputEl) {
+  if (!inputEl) inputEl = document.getElementById('typeSentenceInput');
+  if (!inputEl) return;
+
+  var appended = "";
   if (romajiBuffer === 'n') {
-    appendStringToInput('ん');
+    appended = "ん";
   } else if (romajiBuffer.length > 0) {
     if (ROMAJI_TABLE[romajiBuffer]) {
-      appendStringToInput(ROMAJI_TABLE[romajiBuffer]);
+      appended = ROMAJI_TABLE[romajiBuffer];
     } else {
-      appendStringToInput(romajiBuffer);
+      appended = romajiBuffer;
     }
   }
+
   romajiBuffer = "";
+
+  if (appended.length > 0) {
+    var start = inputEl.selectionStart || inputEl.value.length;
+    var end = inputEl.selectionEnd || inputEl.value.length;
+    var val = inputEl.value;
+
+    inputEl.value = val.substring(0, start) + appended + val.substring(end);
+    var newPos = start + appended.length;
+    inputEl.setSelectionRange(newPos, newPos);
+  }
+
+  var corrected = applySpecificKatakana(inputEl.value);
+  if (corrected !== inputEl.value) {
+    inputEl.value = corrected;
+  }
+
   updateRomajiGuide();
-}
-
-/**
- * 입력창에 문자열 추가
- */
-function appendStringToInput(str) {
-  var input = document.getElementById('typeSentenceInput');
-  if (!input) return;
-  var start = input.selectionStart || input.value.length;
-  var end = input.selectionEnd || input.value.length;
-  var val = input.value;
-
-  input.value = val.substring(0, start) + str + val.substring(end);
-  var newPos = start + str.length;
-  input.setSelectionRange(newPos, newPos);
-  input.focus();
 }
 
 /**
@@ -231,47 +263,6 @@ function updateRomajiGuide() {
 }
 
 /**
- * 백스페이스 (한 글자 지우기)
- */
-function deleteLastChar() {
-  if (isTypeChecked) return;
-
-  // 만약 로마자 입력 버퍼에 남아있다면 버퍼부터 한 글자 지움
-  if (romajiBuffer.length > 0) {
-    romajiBuffer = romajiBuffer.substring(0, romajiBuffer.length - 1);
-    updateRomajiGuide();
-    return;
-  }
-
-  var input = document.getElementById('typeSentenceInput');
-  if (!input) return;
-
-  var start = input.selectionStart;
-  var end = input.selectionEnd;
-  var val = input.value;
-
-  if (start === end) {
-    if (start > 0) {
-      input.value = val.substring(0, start - 1) + val.substring(end);
-      input.setSelectionRange(start - 1, start - 1);
-    }
-  } else {
-    input.value = val.substring(0, start) + val.substring(end);
-    input.setSelectionRange(start, start);
-  }
-  input.focus();
-}
-
-/**
- * 스페이스바 (공백 삽입)
- */
-function handleSpaceKey() {
-  if (isTypeChecked) return;
-  flushRomajiBuffer();
-  appendStringToInput(' ');
-}
-
-/**
  * 전체 지우기
  */
 function clearTypeInput() {
@@ -285,29 +276,10 @@ function clearTypeInput() {
 }
 
 /**
- * 가타카나 칩 삽입 (단어 단위 클릭)
- */
-function insertKatakanaWord(kata) {
-  if (isTypeChecked) return;
-  flushRomajiBuffer();
-  appendStringToInput(kata);
-}
-
-/**
- * 문장에서 가타카나 단어 추출
- */
-function extractKatakanaWords(sentence) {
-  var katakanaRegex = /[\u30A0-\u30FF]+/g;
-  var matches = sentence.match(katakanaRegex);
-  if (!matches) return [];
-  return Array.from(new Set(matches));
-}
-
-/**
- * 다음 문제 출제
+ * 다음 문제 출제 (3-4과 문장 CSV 풀에서 무작위 선택)
  */
 function nextTypeSentence() {
-  if (!sentenceList || sentenceList.length === 0) {
+  if (!exactSentenceList || exactSentenceList.length === 0) {
     alert("문장 데이터가 없습니다.");
     return;
   }
@@ -326,51 +298,42 @@ function nextTypeSentence() {
     input.readOnly = false;
   }
 
-  currentTypeSentence = sentenceList[Math.floor(Math.random() * sentenceList.length)];
+  currentTypeSentence = exactSentenceList[Math.floor(Math.random() * exactSentenceList.length)];
   typeSolved++;
   document.getElementById('typeCount').innerText = typeSolved;
   document.getElementById('typeKoreanHint').innerText = currentTypeSentence.mean;
 
-  var fullTargetText = currentTypeSentence.chunks.join('');
-  currentTypeSentence.fullText = fullTargetText;
-
-  // 가타카나 칩 렌더링
-  var katakanaBox = document.getElementById('katakanaBox');
-  var katakanaShelf = document.getElementById('katakanaShelf');
-  katakanaShelf.innerHTML = '';
-
-  var kataList = extractKatakanaWords(fullTargetText);
-  if (kataList.length > 0) {
-    katakanaBox.style.display = 'block';
-    kataList.forEach(function(kata) {
-      var kBtn = document.createElement('button');
-      kBtn.type = 'button';
-      kBtn.className = 'katakana-chip';
-      kBtn.innerText = kata;
-      kBtn.title = '클릭하여 입력창에 넣기';
-      kBtn.onclick = function() {
-        insertKatakanaWord(kata);
-      };
-      katakanaShelf.appendChild(kBtn);
-    });
-  } else {
-    katakanaBox.style.display = 'none';
-  }
-
-  initVirtualKeyboard();
   setTimeout(function() {
     if (input) input.focus();
   }, 100);
 }
 
 /**
- * 정답 확인
+ * 정답 비교 시 불필요한 차이 정규화 함수
+ * - 전각/반각 공백 통일
+ * - 일본어 물결표(～)와 일반 물결표(~) 통일
+ * - 마침표/쉼표/물음표/느낌표 전각 통일
+ */
+function normalizeSentence(str) {
+  if (!str) return "";
+  return str
+    .trim()
+    .replace(/\s+/g, '') // 공백 제거 비교 (또는 동일 띄어쓰기)
+    .replace(/~/g, '～')
+    .replace(/\./g, '。')
+    .replace(/,/g, '、')
+    .replace(/\?/g, '？')
+    .replace(/!/g, '！');
+}
+
+/**
+ * 정답 확인 (CSV 원본 문장과 엄격하게 대조)
  */
 function checkTypeSentence() {
   if (isTypeChecked) return;
-  flushRomajiBuffer();
-
   var input = document.getElementById('typeSentenceInput');
+  flushRomajiBuffer(input);
+
   var userText = (input ? input.value : "").trim();
   var feedback = document.getElementById('typeFeedback');
 
@@ -385,42 +348,121 @@ function checkTypeSentence() {
   document.getElementById('btnNextType').disabled = false;
   if (input) input.readOnly = true;
 
-  var cleanUser = userText.replace(/\s+/g, '');
-  var cleanTarget = currentTypeSentence.fullText.replace(/\s+/g, '');
+  var exactTarget = currentTypeSentence.sentence;
+  var normUser = normalizeSentence(userText);
+  var normTarget = normalizeSentence(exactTarget);
 
-  if (cleanUser === cleanTarget) {
-    feedback.innerText = "🎉 대단해요! 완벽하게 문장을 작성했습니다!";
+  if (normUser === normTarget) {
+    feedback.innerHTML = "🎉 <b>정답입니다!</b> 완벽하게 작성했습니다.";
     feedback.style.color = "#059669";
-    speak(cleanTarget);
+    speak(exactTarget);
   } else {
-    feedback.innerHTML = "❌ 아쉬워요! <br>정답: <b style='color:#1E3D31;'>" + currentTypeSentence.fullText + "</b>";
+    feedback.innerHTML = "❌ <b>오답입니다!</b><br>정답: <b style='color:#1E3D31; font-size:1.08rem;'>" + exactTarget + "</b>";
     feedback.style.color = "#DC2626";
-    speak(cleanTarget);
+    speak(exactTarget);
   }
 }
 
-// 키보드 직접 입력(PC 키보드 등) 이벤트 리스너 연동
+/**
+ * 키보드 이벤트 리스너 등록 (디바이스 실제 키보드 연동)
+ */
 document.addEventListener('DOMContentLoaded', function() {
   var input = document.getElementById('typeSentenceInput');
   if (input) {
+    // 키 다운 이벤트
     input.addEventListener('keydown', function(e) {
       if (isTypeChecked) return;
 
-      // 알파벳 키 입력 시 자동 로마자 변환 처리
+      // 1. 알파벳 (a-z, A-Z, -)
       if (/^[a-zA-Z\-]$/.test(e.key)) {
         e.preventDefault();
-        handleKeyInput(e.key.toLowerCase());
-      } else if (e.key === 'Backspace') {
+        romajiBuffer += e.key.toLowerCase();
+        processRomajiInput(input);
+        return;
+      }
+
+      // 2. 온점 '.' 입력 시 일본어 온점 '。'로 자동 변환
+      if (e.key === '.') {
+        e.preventDefault();
+        flushRomajiBuffer(input);
+        var start = input.selectionStart;
+        var end = input.selectionEnd;
+        input.value = input.value.substring(0, start) + '。' + input.value.substring(end);
+        input.setSelectionRange(start + 1, start + 1);
+        return;
+      }
+
+      // 3. 쉼표 ',' 입력 시 일본어 쉼표 '、'로 자동 변환
+      if (e.key === ',') {
+        e.preventDefault();
+        flushRomajiBuffer(input);
+        var start = input.selectionStart;
+        var end = input.selectionEnd;
+        input.value = input.value.substring(0, start) + '、' + input.value.substring(end);
+        input.setSelectionRange(start + 1, start + 1);
+        return;
+      }
+
+      // 4. 물음표 '?' / 느낌표 '!' 입력 시 전각 변환
+      if (e.key === '?') {
+        e.preventDefault();
+        flushRomajiBuffer(input);
+        var start = input.selectionStart;
+        var end = input.selectionEnd;
+        input.value = input.value.substring(0, start) + '？' + input.value.substring(end);
+        input.setSelectionRange(start + 1, start + 1);
+        return;
+      }
+      if (e.key === '!') {
+        e.preventDefault();
+        flushRomajiBuffer(input);
+        var start = input.selectionStart;
+        var end = input.selectionEnd;
+        input.value = input.value.substring(0, start) + '！' + input.value.substring(end);
+        input.setSelectionRange(start + 1, start + 1);
+        return;
+      }
+
+      // 5. 백스페이스
+      if (e.key === 'Backspace') {
         if (romajiBuffer.length > 0) {
           e.preventDefault();
-          deleteLastChar();
+          romajiBuffer = romajiBuffer.substring(0, romajiBuffer.length - 1);
+          updateRomajiGuide();
         }
-      } else if (e.key === ' ' || e.key === 'Spacebar') {
-        e.preventDefault();
-        handleSpaceKey();
-      } else if (e.key === 'Enter') {
+        return;
+      }
+
+      // 6. 스페이스바 (공백)
+      if (e.key === ' ' || e.key === 'Spacebar') {
+        flushRomajiBuffer(input);
+        return;
+      }
+
+      // 7. 엔터 (정답 확인)
+      if (e.key === 'Enter') {
         e.preventDefault();
         checkTypeSentence();
+        return;
+      }
+    });
+
+    // 모바일 등 가상 키패드 또는 붙여넣기 input 이벤트 대응
+    input.addEventListener('input', function(e) {
+      if (isTypeChecked) return;
+      var curVal = input.value;
+      // 온점 마침표가 들어간 경우 '。'로 치환
+      if (curVal.indexOf('.') !== -1) {
+        var pos = input.selectionStart;
+        input.value = curVal.split('.').join('。');
+        input.setSelectionRange(pos, pos);
+      }
+      // 가타카나 자동 변환
+      var corrected = applySpecificKatakana(input.value);
+      if (corrected !== input.value) {
+        var pos = input.selectionStart;
+        input.value = corrected;
+        input.setSelectionRange(pos, pos);
       }
     });
   }

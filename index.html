@@ -99,7 +99,7 @@
 
     </div>
 
-    <!-- 3. 문장 직접 입력 완성 영역 (가상 키보드 + 가타카나 블록) -->
+    <!-- 3. 문장 직접 입력 완성 영역 (로마자 타이핑 자동 변환) -->
     <div id="typeQuizArea" class="quiz-box" style="display: none;">
       <div class="info-header">
         <span style="color:var(--board-green); font-weight:800;">⌨️ 문장 입력 완성 퀴즈</span>
@@ -108,33 +108,28 @@
 
       <div class="korean-hint" id="typeKoreanHint">한국어 뜻이 표시됩니다</div>
 
-      <!-- 가타카나 칩 보관함 (가타카나가 있는 경우에만 표시) -->
-      <div id="katakanaBox" style="display: none;">
-        <div class="section-label">🏷️ 가타카나 단어 (클릭하여 입력칸에 추가):</div>
-        <div class="katakana-shelf" id="katakanaShelf"></div>
-      </div>
-
-      <div class="section-label">✍️ 입력한 일본어 문장: <span id="romajiPending" class="romaji-pending-badge" style="display:none;"></span></div>
+      <div class="section-label">✍️ 일본어 문장 입력 (키보드로 영문 로마자 입력 시 자동 변환): <span id="romajiPending" class="romaji-pending-badge" style="display:none;"></span></div>
       <div class="type-input-area">
-        <input type="text" id="typeSentenceInput" class="type-input" placeholder="키보드나 화면 버튼으로 로마자를 입력하세요 (예: udon -> うどん)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <input type="text" id="typeSentenceInput" class="type-input" placeholder="키보드로 로마자를 입력하세요 (예: udon -> うどん, . 입력 시 。)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <button type="button" class="type-clear-btn" onclick="clearTypeInput()" title="입력창 전체 지우기">지우기</button>
       </div>
 
-      <!-- QWERTY 화면 가상 키보드 -->
-      <div class="virtual-keyboard">
-        <div class="section-label" style="margin-bottom: 6px;">가상 키보드 (QWERTY 로마자 입력):</div>
-        
-        <!-- QWERTY 자판 3줄 -->
-        <div class="qwerty-container" id="vkQwertyRows"></div>
-
-        <!-- 보조 기능 키 (공백, 기호, 한 글자 삭제) -->
-        <div class="vk-action-bar">
-          <button type="button" class="vk-fn-key" onclick="handleKeyInput('？')">？</button>
-          <button type="button" class="vk-fn-key" onclick="handleKeyInput('！')">！</button>
-          <button type="button" class="vk-fn-key space" onclick="handleSpaceKey()">Space (공백)</button>
-          <button type="button" class="vk-fn-key backspace" onclick="deleteLastChar()">⌫ Backspace</button>
-        </div>
+      <div class="typing-tip-box">
+        💡 <b>입력 팁</b>:
+        <ul style="margin: 6px 0 0 16px; font-size: 0.83rem; line-height: 1.5; color: #4B5563;">
+          <li>영어 로마자로 타이핑하면 실시간으로 히라가나로 바뀝니다. (예: <code>ka</code> ➔ か, <code>re-</code> ➔ れー)</li>
+          <li>외래어(<code>カレー</code>, <code>ジュース</code>, <code>コーラ</code>, <code>パリ</code>, <code>シウ</code>)는 자동으로 가타카나로 바뀝니다.</li>
+          <li>마침표(<code>.</code>)를 누르면 일본어 온점(<code>。</code>)으로 자동 변환됩니다.</li>
+        </ul>
       </div>
+
+      <div class="feedback-text" id="typeFeedback"></div>
+
+      <div class="button-group">
+        <button class="action-btn btn-check" id="btnCheckType" onclick="checkTypeSentence()">정답 확인</button>
+        <button class="action-btn btn-next" id="btnNextType" onclick="nextTypeSentence()" disabled>다음 문제 ➔</button>
+      </div>
+    </div>
 
       <div class="feedback-text" id="typeFeedback"></div>
 
