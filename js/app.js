@@ -39,19 +39,27 @@ function speak(text) {
  */
 function changeMode(mode) {
   currentMode = mode;
-  document.getElementById('btnTabWord').className = (mode === 'word') ? 'tab-btn active' : 'tab-btn';
-  document.getElementById('btnTabSent').className = (mode === 'sentence') ? 'tab-btn active' : 'tab-btn';
-  document.getElementById('btnTabType').className = (mode === 'typing') ? 'tab-btn active' : 'tab-btn';
+  var btnWord = document.getElementById('btnTabWord');
+  var btnSent = document.getElementById('btnTabSent');
+  var btnType = document.getElementById('btnTabType');
 
-  document.getElementById('wordQuizArea').style.display = (mode === 'word') ? 'block' : 'none';
-  document.getElementById('sentQuizArea').style.display = (mode === 'sentence') ? 'block' : 'none';
-  document.getElementById('typeQuizArea').style.display = (mode === 'typing') ? 'block' : 'none';
+  if (btnWord) btnWord.className = (mode === 'word') ? 'tab-btn active' : 'tab-btn';
+  if (btnSent) btnSent.className = (mode === 'sentence') ? 'tab-btn active' : 'tab-btn';
+  if (btnType) btnType.className = (mode === 'typing') ? 'tab-btn active' : 'tab-btn';
+
+  var areaWord = document.getElementById('wordQuizArea');
+  var areaSent = document.getElementById('sentQuizArea');
+  var areaType = document.getElementById('typeQuizArea');
+
+  if (areaWord) areaWord.style.display = (mode === 'word') ? 'block' : 'none';
+  if (areaSent) areaSent.style.display = (mode === 'sentence') ? 'block' : 'none';
+  if (areaType) areaType.style.display = (mode === 'typing') ? 'block' : 'none';
 
   if (mode === 'word') {
     if (!currentWord) nextWord();
   } else if (mode === 'sentence') {
-    // 문장 퀴즈는 비밀번호 없이 바로 시작
-    if (!currentSentence) nextSentence();
+    // 문장 블록 퀴즈 즉시 출제
+    nextSentence();
   } else if (mode === 'typing') {
     if (!currentTypeSentence) nextTypeSentence();
   }
