@@ -108,26 +108,16 @@
 
       <div class="korean-hint" id="typeKoreanHint">한국어 뜻이 표시됩니다</div>
 
-      <div class="section-label">✍️ 일본어 문장 입력 (로마자로 타이핑 시 자동 변환):</div>
+      <div class="section-label">✍️ 일본어 문장 입력:</div>
       <div class="type-input-area">
-        <input type="text" id="typeSentenceInput" class="type-input" placeholder="키보드로 로마자를 입력하세요 (예: udon -> うどん, . -> 。)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <input type="text" id="typeSentenceInput" class="type-input" placeholder="문장을 입력하세요" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <button type="button" class="type-clear-btn" onclick="clearTypeInput()" title="입력창 전체 지우기">지우기</button>
       </div>
 
-      <!-- 제일 밑에 가타카나 단어 배치 (클릭 시 커서 위치에 바로 삽입) -->
+      <!-- 단어 힌트 칩 (클릭 시 문장에 자동 삽입) -->
       <div id="katakanaBoxBottom" style="display: none; margin-top: 10px;">
-        <div class="section-label">🏷️ 가타카나 단어 (클릭하면 문장에 자동 추가):</div>
+        <div class="section-label">🏷️ 단어 힌트 (클릭하면 문장에 자동 추가):</div>
         <div class="katakana-shelf-bottom" id="katakanaShelfBottom"></div>
-      </div>
-
-      <div class="typing-tip-box" style="margin-top: 12px;">
-        💡 <b>입력 팁</b>:
-        <ul style="margin: 6px 0 0 16px; font-size: 0.83rem; line-height: 1.5; color: #4B5563;">
-          <li>영어 로마자로 타이핑하면 히라가나로 자동 변환됩니다. (예: <code>udon</code> ➔ うどん, <code>motto</code> ➔ もっと)</li>
-          <li>중간을 클릭하여 글자를 삽입하거나 지울 수 있습니다.</li>
-          <li>가타카나 단어는 아래 <b>주황색 단어 블록을 클릭</b>하면 문장에 즉시 삽입됩니다.</li>
-          <li>온점(<code>.</code>)을 누르면 일본어 마침표(<code>。</code>)로 변환됩니다.</li>
-        </ul>
       </div>
 
       <div class="feedback-text" id="typeFeedback"></div>

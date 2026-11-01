@@ -1,14 +1,15 @@
 /**
- * 로마자 -> 히라가나 매핑 테이블 (긴 음절 우선)
+ * 로마자 -> 히라가나 매핑 테이블
  */
 var ROMAJI_TABLE = {
-  // 4글자 / 3글자 (요음 및 특수음)
+  // 4글자 / 3글자
   "xtsu": "っ", "xtu": "っ", "ltsu": "っ", "ltu": "っ",
   "kya": "きゃ", "kyu": "きゅ", "kyo": "きょ", "kye": "きぇ", "kyi": "きぃ",
   "sha": "しゃ", "shu": "しゅ", "sho": "しょ", "she": "しぇ",
   "sya": "しゃ", "syu": "しゅ", "syo": "しょ", "sye": "しぇ",
   "cha": "ちゃ", "chu": "ちゅ", "cho": "ちょ", "che": "ちぇ",
   "tya": "ちゃ", "tyu": "ちゅ", "tyo": "ちょ", "tye": "ちぇ",
+  "cya": "ちゃ", "cyu": "ちゅ", "cyo": "ちょ", "cye": "ちぇ",
   "tsu": "つ",
   "nya": "にゃ", "nyu": "にゅ", "nyo": "にょ", "nye": "にぇ",
   "hya": "ひゃ", "hyu": "ひゅ", "hyo": "ひょ", "hye": "ひぇ",
@@ -27,8 +28,7 @@ var ROMAJI_TABLE = {
   "ka": "か", "ki": "き", "ku": "く", "ke": "け", "ko": "こ",
   "sa": "さ", "si": "し", "shi": "し", "su": "す", "se": "せ", "so": "そ",
   "ta": "た", "ti": "ち", "chi": "ち", "tu": "つ", "te": "て", "to": "と",
-  "na": "나", "ni": "に", "nu": "ぬ", "ne": "ね", "no": "の",
-  "na": "な",
+  "na": "な", "ni": "に", "nu": "ぬ", "ne": "ね", "no": "の",
   "nn": "ん", "xn": "ん",
   "ha": "は", "hi": "ひ", "hu": "ふ", "fu": "ふ", "he": "へ", "ho": "ほ",
   "fa": "ふぁ", "fi": "ふぃ", "fe": "ふぇ", "fo": "ふぉ",
@@ -36,7 +36,8 @@ var ROMAJI_TABLE = {
   "ya": "や", "yu": "ゆ", "yo": "よ",
   "ra": "ら", "ri": "り", "ru": "る", "re": "れ", "ro": "ろ",
   "wa": "わ", "wo": "を",
-  "ga": "が", "gi": "ぎ", "gu": "ぐ", "ge": "げ", "go": "ご",
+  "ga": "가", "gi": "ぎ", "gu": "ぐ", "ge": "げ", "go": "ご",
+  "ga": "が",
   "za": "ざ", "zi": "じ", "ji": "じ", "zu": "ず", "ze": "ぜ", "zo": "ぞ",
   "ja": "じゃ", "ju": "じゅ", "jo": "じょ",
   "da": "だ", "di": "ぢ", "du": "づ", "de": "で", "do": "ど",
@@ -136,51 +137,55 @@ function convertRomajiTextToHiragana(text) {
 }
 
 /**
- * 3-4과 문장 데이터 목록 (한자 100% 완전 배제, 모두 히라가나/가타카나로 변환)
+ * 3-4과 문장 데이터 목록 (한자 100% 완전 배제, 모두 가나로 변환)
  */
 var exactSentenceList = [
-  { "sentence": "うどんに　します。", "mean": "우동으로 하겠습니다." },
-  { "sentence": "じゅぎょうは　なんじからですか。", "mean": "수업은 몇시부터 입니까?" },
-  { "sentence": "くじからです", "mean": "9시부터입니다." },
-  { "sentence": "たなかさん、なにに　しますか。", "mean": "다나카씨, 무엇으로 하시겠습니까?" },
-  { "sentence": "カレーと　ジュースに　します。", "mean": "카레와 주스로 하겠습니다." },
-  { "sentence": "そばの　ほうが　おいしいです。", "mean": "메밀국수 쪽이 (더) 맛있어요." },
-  { "sentence": "えいごと　すうがくと　どちらが　むずかしいですか。", "mean": "영어와 수학 중에 어느 쪽이 어렵습니까?" },
-  { "sentence": "すうがくの　ほうが　むずかしいです。", "mean": "수학 쪽이 (더) 어렵습니다." },
-  { "sentence": "パリの　なつは　あついですか。", "mean": "파리의 여름은 덥습니까?" },
-  { "sentence": "いいえ、あまり　あつくないです。", "mean": "아니요, 그다지 덥지 않습니다." },
-  { "sentence": "あした、おひる　いっしょに　どう？", "mean": "내일, 점심 같이 어때?" },
-  { "sentence": "いいよ！", "mean": "좋아!" },
-  { "sentence": "この　おみせ、やすくて　おいしいよ。", "mean": "이 가게, 싸고 맛있어" },
-  { "sentence": "いいね。カレーと　てんぷら、どっちが　おいしいかな。", "mean": "좋네. 카레와 튀김, 어느쪽이 맛있을까?" },
-  { "sentence": "この　みせ、カレーうどんが　にんきだよ。", "mean": "이 가게는 카레우동이 인기야." },
-  { "sentence": "じゃあ、カレーうどんに　する。", "mean": "그럼, 카레우동으로 할게." },
-  { "sentence": "わたしも～", "mean": "나도~" },
-  { "sentence": "ぼくは　てんぷらうどんに　するよ。", "mean": "나는 튀김우동으로 할게." },
-  { "sentence": "うどんに　カレーは　ちょっと", "mean": "우동에 카레는 좀..." },
-  { "sentence": "じゃあ、あした じゅうにじに　がっこうの　まえで。", "mean": "그럼, 내일 12시에 학교 앞에서." },
-  { "sentence": "は～い。", "mean": "네~" },
-  { "sentence": "とても　きれいです。", "mean": "매우 예쁘다." },
-  { "sentence": "たなかさん、のみものでは　なにが　すきですか。", "mean": "다나카씨는 음료중에서 무엇을 좋아합니까?" },
-  { "sentence": "コーラが　すきです。", "mean": "콜라를 좋아합니다." },
-  { "sentence": "あの　おんせんは　どうですか。", "mean": "저 온천은 어때요?" },
-  { "sentence": "とても　ゆうめいです。", "mean": "매우 유명합니다." },
-  { "sentence": "あまり　ゆうめいじゃ　ありません", "mean": "그다지 유명하지 않습니다." },
-  { "sentence": "にぎやかだね。", "mean": "번화하네." },
-  { "sentence": "うん。がいこくの　ひとも　おおいね。", "mean": "응. 외국인도 많네." },
-  { "sentence": "あの　ふね、いくらかな。", "mean": "저 배는 얼마일까?" },
-  { "sentence": "ええと、ひとり きゅうひゃくえん。", "mean": "음, 한 사람에 900엔." },
-  { "sentence": "シウくんは　にほんの　どんな　たべものが　すき？", "mean": "시우 군은 일본의 어떤 음식을 좋아해?" },
-  { "sentence": "たこやきが　いちばん　すき。", "mean": "타코야끼를 가장 좋아해." },
-  { "sentence": "すみません。これ、ふたつ　ください。", "mean": "실례합니다. 이거, 두 개 주세요." },
-  { "sentence": "はい、ふたつですね。せんにひゃくえんです。", "mean": "네, 두 개네요. 1200엔입니다." },
-  { "sentence": "わあ、すごく　おいしい！", "mean": "와, 정말 맛있어!" },
-  { "sentence": "わあ、はやい。おもしろいね。", "mean": "와, 빠르다. 재미있네" }
+  { "sentence": "うどんに　します。", "mean": "우동으로 하겠습니다.", "chunks": ["うどん", "に", "します"] },
+  { "sentence": "じゅぎょうは　なんじからですか。", "mean": "수업은 몇시부터 입니까?", "chunks": ["じゅぎょう", "は", "なんじ", "から", "ですか"] },
+  { "sentence": "くじからです", "mean": "9시부터입니다.", "chunks": ["くじ", "から", "です"] },
+  { "sentence": "たなかさん、なにに　しますか。", "mean": "다나카씨, 무엇으로 하시겠습니까?", "chunks": ["たなかさん", "なに", "に", "しますか"] },
+  { "sentence": "カレーと　ジュースに　します。", "mean": "카레와 주스로 하겠습니다.", "chunks": ["カレー", "と", "ジュース", "に", "します"] },
+  { "sentence": "そばの　ほうが　おいしいです。", "mean": "메밀국수 쪽이 (더) 맛있어요.", "chunks": ["そば", "の", "ほう", "が", "おいしいです"] },
+  { "sentence": "えいごと　すうがくと　どちらが　むずかしいですか。", "mean": "영어와 수학 중에 어느 쪽이 어렵습니까?", "chunks": ["えいご", "と", "すう가く", "と", "どちら", "が", "むずかしいですか"] },
+  { "sentence": "すうがくの　ほうが　むずかしいです。", "mean": "수학 쪽이 (더) 어렵습니다.", "chunks": ["すうがく", "の", "ほう", "が", "むずかしいです"] },
+  { "sentence": "パリの　なつは　あついですか。", "mean": "파리의 여름은 덥습니까?", "chunks": ["パリ", "の", "なつ", "は", "あついですか"] },
+  { "sentence": "いいえ、あまり　あつくないです。", "mean": "아니요, 그다지 덥지 않습니다.", "chunks": ["いいえ", "あまり", "あつくないです"] },
+  { "sentence": "あした、おひる　いっしょに　どう？", "mean": "내일, 점심 같이 어때?", "chunks": ["あした", "おひる", "いっしょに", "どう"] },
+  { "sentence": "いいよ！", "mean": "좋아!", "chunks": ["いいよ"] },
+  { "sentence": "この　おみせ、やすくて　おいしいよ。", "mean": "이 가게, 싸고 맛있어", "chunks": ["この", "おみせ", "やすくて", "おいしいよ"] },
+  { "sentence": "いいね。カレーと　てんぷら、どっちが　おいしいかな。", "mean": "좋네. 카레와 튀김, 어느쪽이 맛있을까?", "chunks": ["いいね", "カレー", "と", "てんぷら", "どっち", "が", "おいしいかな"] },
+  { "sentence": "この　みせ、カレーうどんが　にんきだよ。", "mean": "이 가게는 카레우동이 인기야.", "chunks": ["この", "みせ", "カレーうどん", "が", "にんきだよ"] },
+  { "sentence": "じゃあ、カレーうどんに　する。", "mean": "그럼, 카레우동으로 할게.", "chunks": ["じゃあ", "カレーうどん", "に", "する"] },
+  { "sentence": "わたしも～", "mean": "나도~", "chunks": ["わたしも"] },
+  { "sentence": "ぼくは　てんぷらうどんに　するよ。", "mean": "나는 튀김우동으로 할게.", "chunks": ["ぼく", "は", "てんぷらうどん", "に", "するよ"] },
+  { "sentence": "うどんに　カレーは　ちょっと", "mean": "우동에 카레는 좀...", "chunks": ["うどん", "に", "カレー", "は", "ちょっと"] },
+  { "sentence": "じゃあ、あした じゅうにじに　がっこうの　まえで。", "mean": "그럼, 내일 12시에 학교 앞에서.", "chunks": ["じゃあ", "あした", "じゅうにじ", "に", "がっこう", "の", "まえで"] },
+  { "sentence": "は～い。", "mean": "네~", "chunks": ["はーい"] },
+  { "sentence": "とても　きれいです。", "mean": "매우 예쁘다.", "chunks": ["とても", "きれい", "です"] },
+  { "sentence": "たなかさん、のみものでは　なにが　すきですか。", "mean": "다나카씨는 음료중에서 무엇을 좋아합니까?", "chunks": ["たなかさん", "のみもの", "では", "なに", "が", "すきですか"] },
+  { "sentence": "コーラが　すきです。", "mean": "콜라를 좋아합니다.", "chunks": ["コーラ", "が", "すきです"] },
+  { "sentence": "あの　おんせんは　どうですか。", "mean": "저 온천은 어때요?", "chunks": ["あの", "おんせん", "は", "どうですか"] },
+  { "sentence": "とても　ゆうめいです。", "mean": "매우 유명합니다.", "chunks": ["とても", "ゆうめい", "です"] },
+  { "sentence": "あまり　ゆうめいじゃ　ありません", "mean": "그다지 유명하지 않습니다.", "chunks": ["あまり", "ゆうめい", "じゃ", "ありません"] },
+  { "sentence": "にぎやかだね。", "mean": "번화하네.", "chunks": ["にぎやか", "だね"] },
+  { "sentence": "うん。がいこくの　ひとも　おおいね。", "mean": "응. 외국인도 많네.", "chunks": ["うん", "がいこく", "の", "ひと", "も", "おおいね"] },
+  { "sentence": "あの　ふね、いくらかな。", "mean": "저 배는 얼마일까?", "chunks": ["あの", "ふね", "いくらかな"] },
+  { "sentence": "ええと、ひとり きゅうひゃくえん。", "mean": "음, 한 사람에 900엔.", "chunks": ["ええと", "ひとり", "きゅうひゃくえん"] },
+  { "sentence": "シウくんは　にほんの　どんな　たべものが　すき？", "mean": "시우 군은 일본의 어떤 음식을 좋아해?", "chunks": ["シウくん", "は", "にほん", "の", "どんな", "たべもの", "が", "すき"] },
+  { "sentence": "たこやきが　いちばん　すき。", "mean": "타코야끼를 가장 좋아해.", "chunks": ["たこやき", "가", "いちばん", "すき"] },
+  { "sentence": "すみません。これ、ふたつ　ください。", "mean": "실례합니다. 이거, 두 개 주세요.", "chunks": ["すみません", "これ", "ふたつ", "ください"] },
+  { "sentence": "はい、ふたつですね。せんにひゃくえんです。", "mean": "네, 두 개네요. 1200엔입니다.", "chunks": ["はい", "ふたつですね", "せんにひゃくえんです"] },
+  { "sentence": "わあ、すごく　おいしい！", "mean": "와, 정말 맛있어!", "chunks": ["わあ", "すごく", "おいしい"] },
+  { "sentence": "わあ、はやい。おもしろいね。", "mean": "와, 빠르다. 재미있네", "chunks": ["わあ", "はやい", "おもしろいね"] }
 ];
 
-// 중복 제거
-exactSentenceList = exactSentenceList.filter(function(item, index, self) {
-  return index === self.findIndex(function(t) { return t.sentence === item.sentence; });
+// 중복 제거 및 오타 정정
+exactSentenceList.forEach(function(item) {
+  if (item.chunks) {
+    item.chunks = item.chunks.map(function(c) {
+      return c.replace(/가/g, 'が');
+    });
+  }
 });
 
 var currentTypeSentence = null;
@@ -188,20 +193,38 @@ var isTypeChecked = false;
 var typeSolved = 0;
 
 /**
- * 문장에서 가타카나 단어 추출 (유니코드 30A0-30FF 범위)
+ * 문장에서 클릭 가능한 단어 힌트 칩 목록 추출
+ * (가타카나 단어 + 문장 내 주요 단어 청크 제공)
  */
-function extractKatakanaWords(sentence) {
-  if (!sentence) return [];
-  var katakanaRegex = /[\u30A0-\u30FFー]+/g;
-  var matches = sentence.match(katakanaRegex);
-  if (!matches) return [];
-  return Array.from(new Set(matches));
+function getSentenceHintChips(item) {
+  if (!item) return [];
+  var set = [];
+
+  // 1. 가타카나 단어가 있으면 최우선 등록
+  var kataMatches = item.sentence.match(/[\u30A0-\u30FFー]+/g);
+  if (kataMatches) {
+    kataMatches.forEach(function(k) {
+      if (!set.includes(k)) set.push(k);
+    });
+  }
+
+  // 2. 청크 단위 단어들 등록 (조사 한 글자 제외한 단어들)
+  if (item.chunks && item.chunks.length > 0) {
+    item.chunks.forEach(function(chk) {
+      var clean = chk.replace(/[\s\u3000.。、,?!？！~～]/g, '').trim();
+      if (clean && clean.length > 1 && !set.includes(clean)) {
+        set.push(clean);
+      }
+    });
+  }
+
+  return set;
 }
 
 /**
- * 커서 위치에 가타카나 단어 삽입
+ * 커서 위치에 단어 칩 삽입
  */
-function insertKatakanaChip(kata) {
+function insertChipText(text) {
   if (isTypeChecked) return;
   var input = document.getElementById('typeSentenceInput');
   if (!input) return;
@@ -210,38 +233,38 @@ function insertKatakanaChip(kata) {
   var end = input.selectionEnd != null ? input.selectionEnd : input.value.length;
   var val = input.value;
 
-  input.value = val.substring(0, start) + kata + val.substring(end);
-  var newPos = start + kata.length;
+  input.value = val.substring(0, start) + text + val.substring(end);
+  var newPos = start + text.length;
   input.setSelectionRange(newPos, newPos);
   input.focus();
 }
 
 /**
- * 가타카나 하단 단어 칩 갱신 렌더러
+ * 하단 단어 칩 목록 갱신 렌더러
  */
-function updateKatakanaShelf(sentence) {
-  var kataBox = document.getElementById('katakanaBoxBottom');
-  var kataShelf = document.getElementById('katakanaShelfBottom');
-  if (!kataBox || !kataShelf) return;
+function updateHintShelf(item) {
+  var box = document.getElementById('katakanaBoxBottom');
+  var shelf = document.getElementById('katakanaShelfBottom');
+  if (!box || !shelf) return;
 
-  kataShelf.innerHTML = '';
-  var kataList = extractKatakanaWords(sentence);
+  shelf.innerHTML = '';
+  var chips = getSentenceHintChips(item);
 
-  if (kataList && kataList.length > 0) {
-    kataBox.style.display = 'block';
-    kataList.forEach(function(kata) {
+  if (chips && chips.length > 0) {
+    box.style.display = 'block';
+    chips.forEach(function(word) {
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'katakana-chip';
-      btn.innerText = kata;
-      btn.title = '클릭하면 문장에 삽입됩니다';
+      btn.innerText = word;
+      btn.title = '클릭하면 문장에 자동 삽입됩니다';
       btn.onclick = function() {
-        insertKatakanaChip(kata);
+        insertChipText(word);
       };
-      kataShelf.appendChild(btn);
+      shelf.appendChild(btn);
     });
   } else {
-    kataBox.style.display = 'none';
+    box.style.display = 'none';
   }
 }
 
@@ -281,8 +304,8 @@ function nextTypeSentence() {
   document.getElementById('typeCount').innerText = typeSolved;
   document.getElementById('typeKoreanHint').innerText = currentTypeSentence.mean;
 
-  // 가타카나 주황색 블록 갱신
-  updateKatakanaShelf(currentTypeSentence.sentence);
+  // 하단 단어 칩 갱신
+  updateHintShelf(currentTypeSentence);
 
   setTimeout(function() {
     if (input) input.focus();
@@ -291,7 +314,6 @@ function nextTypeSentence() {
 
 /**
  * 가타카나를 히라가나로 변환하는 유틸리티 (발음 비교용)
- * (유니코드 0x30A1-0x30F6 -> 0x3041-0x3096)
  */
 function katakanaToHiragana(str) {
   if (!str) return "";
@@ -303,25 +325,20 @@ function katakanaToHiragana(str) {
 
 /**
  * 문장 정규화:
- * - 물결표(~, ～), 온점(., 。), 쉼표(,, 、), 물음표(?, ？), 느낌표(!, ！), 말줄임표(…), 공백 등
- *   문장 어디에 위치하든 모든 문장부호와 띄어쓰기를 100% 제거
- * - 가타카나를 히라가나로 모두 변환하여, 가타카나 칩으로 넣었든 히라가나로 직접 타이핑했든 똑같이 정답 인정!
+ * - 물결표, 온점, 쉼표, 물음표, 느낌표, 공백 완전 제거
+ * - 가타카나를 히라가나로 정규화
  */
 function stripAllPunctuationAndSpace(str) {
   if (!str) return "";
-  // 1. 가타카나를 히라가나로 정규화
   var hira = katakanaToHiragana(str);
-
-  // 2. 모든 공백 및 모든 문장부호(물결표, 마침표, 쉼표 등) 제거
   return hira
-    .replace(/[\s\u3000]+/g, '')                             // 모든 공백(반각/전각) 제거
-    .replace(/[~～.。、,?!？！…\(\)（）"'`·\-_~]/g, '')     // 모든 물결표 및 문장부호 제거
+    .replace(/[\s\u3000]+/g, '')                             // 모든 공백 제거
+    .replace(/[~～.。、,?!？！…\(\)（）"'`·\-_~]/g, '')     // 모든 문장부호 제거
     .trim();
 }
 
 /**
  * 종결어미(よ, ね, だよ, だね 등) 유연화 함수
- * - 문장 끝의 'よ', 'ね', 'だよ', 'だね'를 벗겨내어 비교할 수 있도록 함
  */
 function stripSentenceEndings(str) {
   if (!str) return str;
@@ -331,10 +348,7 @@ function stripSentenceEndings(str) {
 }
 
 /**
- * 정답 확인:
- * - 문장부호/물결표 유무 무관
- * - 가타카나 칩을 넣었든, 히라가나 발음으로 직접 입력했든 둘 다 정답 인정!
- * - 문장 끝 종결어미(よ / ね / だよ / だね) 차이 유연하게 허용 (눈치껏 정답 처리)
+ * 정답 확인
  */
 function checkTypeSentence() {
   if (isTypeChecked) return;
@@ -369,7 +383,7 @@ function checkTypeSentence() {
   // 1. 완전 일치 (공백/부호/가타카나 차이 무시)
   var isCorrect = (cleanUser === cleanTarget);
 
-  // 2. 종결어미(よ, ね 등) 눈치껏 맞다 해주기 (종결어미 제거 후 비교)
+  // 2. 종결어미(よ, ね 등) 눈치껏 맞다 해주기
   if (!isCorrect) {
     var baseUser = stripSentenceEndings(cleanUser);
     var baseTarget = stripSentenceEndings(cleanTarget);
@@ -414,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // 2. 쉼표 ',' 입력 시 일본어 쉼표 '、'로 변환
       converted = converted.replace(/,/g, '、');
 
-      // 3. 로마자 -> 히라가나 변환 (chotto, motto, kya, sha 등 완벽 지원)
+      // 3. 로마자 -> 히라가나 변환 (chotto -> ちょっと 완벽 대응)
       converted = convertRomajiTextToHiragana(converted);
 
       if (converted !== oldVal) {
