@@ -1,24 +1,25 @@
 /**
- * 로마자 -> 히라가나 매핑 테이블 (긴 음절 우선 정렬 처리)
+ * 로마자 -> 히라가나 매핑 테이블 (긴 음절 우선)
  */
 var ROMAJI_TABLE = {
-  // 3글자 이상 (요음, 특수음)
-  "kya": "きゃ", "kyu": "きゅ", "kyo": "きょ",
-  "sha": "しゃ", "shu": "しゅ", "sho": "しょ", "she": "しぇ",
-  "sya": "しゃ", "syu": "しゅ", "syo": "しょ",
-  "cha": "ちゃ", "chu": "ちゅ", "cho": "ちょ", "che": "ちぇ",
-  "tya": "ちゃ", "tyu": "ちゅ", "tyo": "ちょ",
-  "tsu": "つ",
-  "nya": "にゃ", "nyu": "にゅ", "nyo": "にょ",
-  "hya": "ひゃ", "hyu": "ひゅ", "hyo": "ひょ",
-  "mya": "みゃ", "myu": "みゅ", "myo": "みょ",
-  "rya": "りゃ", "ryu": "りゅ", "ryo": "りょ",
-  "gya": "ぎゃ", "gyu": "ぎゅ", "gyo": "ぎょ",
-  "zya": "じゃ", "zyu": "じゅ", "zyo": "じょ",
-  "dya": "ぢゃ", "dyu": "ぢゅ", "dyo": "ぢょ",
-  "bya": "びゃ", "byu": "びゅ", "byo": "びょ",
-  "pya": "ぴゃ", "pyu": "ぴゅ", "pyo": "ぴょ",
+  // 4글자 / 3글자 (요음 및 특수음)
   "xtsu": "っ", "xtu": "っ", "ltsu": "っ", "ltu": "っ",
+  "kya": "きゃ", "kyu": "きゅ", "kyo": "きょ", "kye": "きぇ", "kyi": "きぃ",
+  "sha": "しゃ", "shu": "しゅ", "sho": "しょ", "she": "しぇ",
+  "sya": "しゃ", "syu": "しゅ", "syo": "しょ", "sye": "しぇ",
+  "cha": "ちゃ", "chu": "ちゅ", "cho": "ちょ", "che": "ちぇ",
+  "tya": "ちゃ", "tyu": "ちゅ", "tyo": "ちょ", "tye": "ちぇ",
+  "tsu": "つ",
+  "nya": "にゃ", "nyu": "にゅ", "nyo": "にょ", "nye": "にぇ",
+  "hya": "ひゃ", "hyu": "ひゅ", "hyo": "ひょ", "hye": "ひぇ",
+  "mya": "みゃ", "myu": "みゅ", "myo": "みょ", "mye": "みぇ",
+  "rya": "りゃ", "ryu": "りゅ", "ryo": "りょ", "rye": "りぇ",
+  "gya": "ぎゃ", "gyu": "ぎゅ", "gyo": "ぎょ", "gye": "ぎぇ",
+  "zya": "じゃ", "zyu": "じゅ", "zyo": "じょ", "zye": "じぇ",
+  "dya": "ぢゃ", "dyu": "ぢゅ", "dyo": "ぢょ", "dye": "ぢぇ",
+  "bya": "비ゃ", "byu": "びゅ", "byo": "びょ", "bye": "びぇ",
+  "bya": "びゃ",
+  "pya": "ぴゃ", "pyu": "ぴゅ", "pyo": "ぴょ", "pye": "ぴぇ",
   "xya": "ゃ", "xyu": "ゅ", "xyo": "ょ",
   "lya": "ゃ", "lyu": "ゅ", "lyo": "ょ",
 
@@ -30,7 +31,8 @@ var ROMAJI_TABLE = {
   "nn": "ん", "xn": "ん",
   "ha": "は", "hi": "ひ", "hu": "ふ", "fu": "ふ", "he": "へ", "ho": "ほ",
   "fa": "ふぁ", "fi": "ふぃ", "fe": "ふぇ", "fo": "ふぉ",
-  "ma": "ま", "mi": "み", "mu": "む", "me": "め", "mo": "も",
+  "ma": "ま", "mi": "み", "mu": "む", "me": "め", "mo": "모",
+  "mo": "も",
   "ya": "や", "yu": "ゆ", "yo": "よ",
   "ra": "ら", "ri": "り", "ru": "る", "re": "れ", "ro": "ろ",
   "wa": "わ", "wo": "を",
@@ -49,7 +51,7 @@ var ROMAJI_TABLE = {
 };
 
 /**
- * 텍스트 내의 알파벳 로마자를 히라가나로 변환하는 순수 변환 함수
+ * 텍스트 내의 알파벳 로마자를 히라가나로 변환하는 함수
  */
 function convertRomajiTextToHiragana(text) {
   var result = "";
@@ -60,14 +62,14 @@ function convertRomajiTextToHiragana(text) {
     var ch = text[i];
     var chLower = ch.toLowerCase();
 
-    // 영문 알파벳이 아니면 그대로 통과
+    // 알파벳 또는 하이픈이 아니면 그대로 유지
     if (!/^[a-z\-]$/.test(chLower)) {
       result += ch;
       i++;
       continue;
     }
 
-    // 촉음 체크: 같은 자음 2연속 (예: tt -> っt, kk -> っk) (단, nn, aeiouwn 제외)
+    // 1. 촉음 체크: 같은 자음 2연속 (예: tt -> っt, kk -> っk) (단, nn, aeiouwn- 제외)
     if (i + 1 < len) {
       var nextCh = text[i + 1].toLowerCase();
       if (chLower === nextCh && !"aeiouwn-".includes(chLower)) {
@@ -77,9 +79,9 @@ function convertRomajiTextToHiragana(text) {
       }
     }
 
-    // 4글자, 3글자, 2글자, 1글자 매칭 시도
+    // 2. 최장 일치 매칭 (4, 3, 2글자)
     var matched = false;
-    for (var l = Math.min(4, len - i); l >= 1; l--) {
+    for (var l = Math.min(4, len - i); l >= 2; l--) {
       var sub = text.substring(i, i + l).toLowerCase();
       if (ROMAJI_TABLE[sub]) {
         result += ROMAJI_TABLE[sub];
@@ -88,10 +90,25 @@ function convertRomajiTextToHiragana(text) {
         break;
       }
     }
-
     if (matched) continue;
 
-    // n 뒤에 자음이 오는 경우 (단, 모음 a,i,u,e,o,y 제외) -> ん
+    // 3. 1글자 모음 매칭 (단, 뒤에 y가 붙는 자음이 아니어야 함)
+    // 만약 현재 문자가 자음(k, s, t, n, h, m, r, g, z, d, b, p 등)이고 뒤에 y가 온다면 1글자로 변환하지 않고 유지
+    if (i + 1 < len && text[i + 1].toLowerCase() === 'y') {
+      result += ch;
+      i++;
+      continue;
+    }
+
+    // 뒤에 모음이나 다른 자음이 올 수 있는 1글자 자음(k, s 등)은 모음이 아니므로 변환 테이블에 없음
+    // 모음 (a, i, u, e, o)인 경우에만 1글자 매칭
+    if (ROMAJI_TABLE[chLower]) {
+      result += ROMAJI_TABLE[chLower];
+      i++;
+      continue;
+    }
+
+    // 4. n 처리: n 뒤에 자음이 오는 경우 (a,i,u,e,o,y 제외) -> ん
     if (chLower === 'n' && i + 1 < len) {
       var nextCh2 = text[i + 1].toLowerCase();
       if (!"aeiouy".includes(nextCh2)) {
@@ -101,14 +118,7 @@ function convertRomajiTextToHiragana(text) {
       }
     }
 
-    // 단어 끝의 n -> ん
-    if (chLower === 'n' && i === len - 1) {
-      result += "ん";
-      i++;
-      continue;
-    }
-
-    // 아직 완성되지 않은 알파벳은 일단 그대로 둠
+    // 아직 완성되지 않은 자음은 그대로 유지
     result += ch;
     i++;
   }
@@ -139,6 +149,7 @@ var exactSentenceList = [
   { "sentence": "わたしも～", "mean": "나도~" },
   { "sentence": "ぼくは　てんぷらうどんに　するよ。", "mean": "나는 튀김우동으로 할게." },
   { "sentence": "うどんに　カレーは　ちょっと", "mean": "우동에 카레는 좀..." },
+  { "sentence": "じゃあ、あした 12じに　가っこうの　まえで。", "mean": "그럼, 내일 12시에 학교 앞에서." },
   { "sentence": "じゃあ、あした 12じに　がっこうの　まえで。", "mean": "그럼, 내일 12시에 학교 앞에서." },
   { "sentence": "は～い。", "mean": "네~" },
   { "sentence": "とても　きれいです。", "mean": "매우 예쁘다." },
@@ -159,6 +170,11 @@ var exactSentenceList = [
   { "sentence": "わあ、はやい。おもしろいね。", "mean": "와, 빠르다. 재미있네" }
 ];
 
+// 중복 제거
+exactSentenceList = exactSentenceList.filter(function(item, index, self) {
+  return index === self.findIndex(function(t) { return t.sentence === item.sentence; });
+});
+
 var currentTypeSentence = null;
 var isTypeChecked = false;
 var typeSolved = 0;
@@ -167,7 +183,8 @@ var typeSolved = 0;
  * 문장에서 가타카나 단어 추출 (유니코드 30A0-30FF 범위)
  */
 function extractKatakanaWords(sentence) {
-  var katakanaRegex = /[\u30A0-\u30FF]+/g;
+  if (!sentence) return [];
+  var katakanaRegex = /[\u30A0-\u30FFー]+/g;
   var matches = sentence.match(katakanaRegex);
   if (!matches) return [];
   return Array.from(new Set(matches));
@@ -192,7 +209,36 @@ function insertKatakanaChip(kata) {
 }
 
 /**
- * 입력창 전체 지우기 기능 (완전 복구)
+ * 가타카나 하단 단어 칩 갱신 렌더러
+ */
+function updateKatakanaShelf(sentence) {
+  var kataBox = document.getElementById('katakanaBoxBottom');
+  var kataShelf = document.getElementById('katakanaShelfBottom');
+  if (!kataBox || !kataShelf) return;
+
+  kataShelf.innerHTML = '';
+  var kataList = extractKatakanaWords(sentence);
+
+  if (kataList && kataList.length > 0) {
+    kataBox.style.display = 'block';
+    kataList.forEach(function(kata) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'katakana-chip';
+      btn.innerText = kata;
+      btn.title = '클릭하면 문장에 삽입됩니다';
+      btn.onclick = function() {
+        insertKatakanaChip(kata);
+      };
+      kataShelf.appendChild(btn);
+    });
+  } else {
+    kataBox.style.display = 'none';
+  }
+}
+
+/**
+ * 입력창 전체 지우기
  */
 function clearTypeInput() {
   if (isTypeChecked) return;
@@ -227,28 +273,8 @@ function nextTypeSentence() {
   document.getElementById('typeCount').innerText = typeSolved;
   document.getElementById('typeKoreanHint').innerText = currentTypeSentence.mean;
 
-  // 문장 하단에 가타카나 단어 칩 목록 표시
-  var kataBox = document.getElementById('katakanaBoxBottom');
-  var kataShelf = document.getElementById('katakanaShelfBottom');
-  kataShelf.innerHTML = '';
-
-  var kataList = extractKatakanaWords(currentTypeSentence.sentence);
-  if (kataList.length > 0) {
-    kataBox.style.display = 'block';
-    kataList.forEach(function(kata) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'katakana-chip';
-      btn.innerText = kata;
-      btn.title = '클릭하면 커서 위치에 단어가 삽입됩니다';
-      btn.onclick = function() {
-        insertKatakanaChip(kata);
-      };
-      kataShelf.appendChild(btn);
-    });
-  } else {
-    kataBox.style.display = 'none';
-  }
+  // 가타카나 주황색 블록 갱신
+  updateKatakanaShelf(currentTypeSentence.sentence);
 
   setTimeout(function() {
     if (input) input.focus();
@@ -256,30 +282,31 @@ function nextTypeSentence() {
 }
 
 /**
- * 정답 비교 시 불필요한 차이 정규화
+ * 문장 정규화 (문장부호 및 띄어쓰기 완전 배제 비교)
+ * - 온점(., 。), 쉼표(,, 、), 물음표(?, ？), 느낌표(!, ！), 물결표(~, ～), 따옴표, 괄호, 공백 전면 제거
  */
-function normalizeSentence(str) {
+function stripAllPunctuationAndSpace(str) {
   if (!str) return "";
   return str
-    .trim()
-    .replace(/\s+/g, '') // 공백 유연화
-    .replace(/~/g, '～')
-    .replace(/\./g, '。')
-    .replace(/,/g, '、')
-    .replace(/\?/g, '？')
-    .replace(/!/g, '！');
+    .replace(/[\s\u3000]+/g, '')                             // 모든 공백(반각/전각) 제거
+    .replace(/[.。、,?!？！\~～…\(\)（）"'`·\-_]/g, '')     // 모든 문장부호 제거
+    .trim();
 }
 
 /**
- * 정답 확인
+ * 정답 확인 (문장부호 유무 상관없이 문자 알맹이만 일치하면 정답 인정)
  */
 function checkTypeSentence() {
   if (isTypeChecked) return;
   var input = document.getElementById('typeSentenceInput');
   if (!input) return;
 
-  // 마지막 미변환 n 처리 (예: udon -> うどん)
-  input.value = convertRomajiTextToHiragana(input.value);
+  // 혹시 끝에 남은 미변환 n 처리 (예: ...desun -> ...ですん)
+  var val = input.value;
+  if (/n$/i.test(val)) {
+    val = val.replace(/n$/i, 'ん');
+    input.value = val;
+  }
 
   var userText = input.value.trim();
   var feedback = document.getElementById('typeFeedback');
@@ -296,10 +323,10 @@ function checkTypeSentence() {
   input.readOnly = true;
 
   var exactTarget = currentTypeSentence.sentence;
-  var normUser = normalizeSentence(userText);
-  var normTarget = normalizeSentence(exactTarget);
+  var cleanUser = stripAllPunctuationAndSpace(userText);
+  var cleanTarget = stripAllPunctuationAndSpace(exactTarget);
 
-  if (normUser === normTarget) {
+  if (cleanUser === cleanTarget) {
     feedback.innerHTML = "🎉 <b>정답입니다!</b> 완벽하게 작성했습니다.";
     feedback.style.color = "#059669";
     speak(exactTarget);
@@ -311,13 +338,11 @@ function checkTypeSentence() {
 }
 
 /**
- * 입력창 이벤트 리스너 등록
- * (중간 커서 클릭, 선택 영역 치환, 중간 타자 삽입 완벽 지원)
+ * 이벤트 리스너 등록
  */
 document.addEventListener('DOMContentLoaded', function() {
   var input = document.getElementById('typeSentenceInput');
   if (input) {
-    // 키보드 엔터 키 시 정답 확인
     input.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -325,7 +350,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
-    // input 이벤트: 디바이스 실제 입력(타이핑, 붙여넣기 등)을 감지하여 커서 위치 보존하며 변환
     input.addEventListener('input', function(e) {
       if (isTypeChecked) return;
 
@@ -338,11 +362,10 @@ document.addEventListener('DOMContentLoaded', function() {
       // 2. 쉼표 ',' 입력 시 일본어 쉼표 '、'로 변환
       converted = converted.replace(/,/g, '、');
 
-      // 3. 로마자 -> 히라가나 변환
+      // 3. 로마자 -> 히라가나 변환 (요음 kya, kyu, kyo, sha, cha, nya 등 완벽 처리)
       converted = convertRomajiTextToHiragana(converted);
 
       if (converted !== oldVal) {
-        // 커서 위치 보정: 변환 전후 글자 수 차이만큼 이동
         var lengthDiff = converted.length - oldVal.length;
         input.value = converted;
         var newPos = Math.max(0, curPos + lengthDiff);
