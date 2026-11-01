@@ -174,7 +174,6 @@ var exactSentenceList = [
   { "sentence": "すみません。これ、ふたつ　ください。", "mean": "실례합니다. 이거, 두 개 주세요." },
   { "sentence": "はい、ふたつですね。せんにひゃくえんです。", "mean": "네, 두 개네요. 1200엔입니다." },
   { "sentence": "わあ、すごく　おいしい！", "mean": "와, 정말 맛있어!" },
-  { "sentence": "わあ、はやい。おもしろ이ね。", "mean": "와, 빠르다. 재미있네" },
   { "sentence": "わあ、はやい。おもしろいね。", "mean": "와, 빠르다. 재미있네" }
 ];
 
@@ -320,9 +319,21 @@ function stripAllPunctuationAndSpace(str) {
 }
 
 /**
+ * 종결어미(よ, ね, だよ, だね 등) 유연화 함수
+ * - 문장 끝의 'よ', 'ね', 'だよ', 'だね'를 벗겨내어 비교할 수 있도록 함
+ */
+function stripSentenceEndings(str) {
+  if (!str) return str;
+  return str
+    .replace(/(だよ|だね)$/, '')
+    .replace(/(よ|ね)$/, '');
+}
+
+/**
  * 정답 확인:
  * - 문장부호/물결표 유무 무관
  * - 가타카나 칩을 넣었든, 히라가나 발음으로 직접 입력했든 둘 다 정답 인정!
+ * - 문장 끝 종결어미(よ / ね / だよ / だね) 차이 유연하게 허용 (눈치껏 정답 처리)
  */
 function checkTypeSentence() {
   if (isTypeChecked) return;
@@ -354,7 +365,19 @@ function checkTypeSentence() {
   var cleanUser = stripAllPunctuationAndSpace(userText);
   var cleanTarget = stripAllPunctuationAndSpace(exactTarget);
 
-  if (cleanUser === cleanTarget) {
+  // 1. 완전 일치 (공백/부호/가타카나 차이 무시)
+  var isCorrect = (cleanUser === cleanTarget);
+
+  // 2. 종결어미(よ, ね 등) 눈치껏 맞다 해주기 (종결어미 제거 후 비교)
+  if (!isCorrect) {
+    var baseUser = stripSentenceEndings(cleanUser);
+    var baseTarget = stripSentenceEndings(cleanTarget);
+    if (baseUser === baseTarget) {
+      isCorrect = true;
+    }
+  }
+
+  if (isCorrect) {
     feedback.innerHTML = "🎉 <b>정답입니다!</b> 완벽하게 작성했습니다.";
     feedback.style.color = "#059669";
     speak(exactTarget);
