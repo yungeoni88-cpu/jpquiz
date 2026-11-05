@@ -77,3 +77,68 @@
   margin-top: 10px;
   min-height: 20px;
 }
+
+
+/* 인트로 시작 게이트 화면 */
+.intro-card {
+  text-align: center;
+  padding: 36px 20px 30px;
+}
+
+.intro-icon {
+  font-size: 2.8rem;
+  margin-bottom: 16px;
+  animation: float 2.4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+.intro-quote-box {
+  background: #FAFAF7;
+  border: 2px dashed #D5CCBE;
+  border-radius: 16px;
+  padding: 22px 14px;
+  margin-bottom: 24px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.intro-japanese {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1E3D31;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.intro-korean {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #64748B;
+  white-space: nowrap;
+  letter-spacing: -0.3px;
+}
+
+.btn-start-quiz {
+  width: 100%;
+  padding: 15px 24px;
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  background: var(--board-green);
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--board-green-dark);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.btn-start-quiz:active {
+  transform: translateY(3px);
+  box-shadow: none !important;
+}

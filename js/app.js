@@ -17,6 +17,49 @@ var sentSolved = 0;
 // 문장 블록 나열 퀴즈 잠금 해제 여부 (비밀번호 없이 즉시 공개)
 var isSentenceUnlocked = true;
 
+// 인트로 동기부여 명언 데이터
+var MOTIVATION_QUOTES = [
+  { jp: "勉強から逃げるな！", ko: "공부에서 도망치지 마!" },
+  { jp: "スマホを見るなら単語を見よう！", ko: "폰을 볼 거면 단어를 보자!" },
+  { jp: "ここまで来たら勉強しよう！", ko: "여기까지 왔으면 공부하자!" },
+  { jp: "今日は天才になれる日！", ko: "오늘은 천재가 될 수 있는 날!" },
+  { jp: "勉強したふりは禁止！", ko: "공부한 척 금지!" },
+  { jp: "その自信、どこから来た？", ko: "그 자신감, 어디서 나온 거야?" },
+  { jp: "まだ一問も解いていませんよ？", ko: "아직 한 문제도 안 풀었는데요?" },
+  { jp: "逃げても単語は追いかけてくる！", ko: "도망쳐도 단어는 쫓아온다!" }
+];
+
+/**
+ * 인트로 명언 랜덤 표시 초기화
+ */
+function initIntroQuote() {
+  var jpEl = document.getElementById('introJpQuote');
+  var koEl = document.getElementById('introKoQuote');
+  if (jpEl && koEl) {
+    var pick = MOTIVATION_QUOTES[Math.floor(Math.random() * MOTIVATION_QUOTES.length)];
+    jpEl.innerText = pick.jp;
+    koEl.innerText = "(" + pick.ko + ")";
+  }
+}
+
+/**
+ * '시작하기' 버튼 클릭 시 퀴즈 화면으로 전환
+ */
+function startQuiz() {
+  var introScreen = document.getElementById('introScreen');
+  var mainApp = document.getElementById('mainApp');
+  if (introScreen) introScreen.style.display = 'none';
+  if (mainApp) mainApp.style.display = 'block';
+
+  if (currentMode === 'word') {
+    nextWord();
+  } else if (currentMode === 'sentence') {
+    nextSentence();
+  } else if (currentMode === 'typing') {
+    nextTypeSentence();
+  }
+}
+
 /**
  * 일본어 발음 음성 출력 (Web Speech API)
  * @param {string} text - 음성으로 읽을 텍스트
@@ -107,5 +150,5 @@ loadWordsFromJSON();
 loadSentencesFromJSON();
 
 window.addEventListener('DOMContentLoaded', function() {
-  nextWord();
+  initIntroQuote();
 });

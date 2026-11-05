@@ -19,8 +19,18 @@
 
 <div class="container">
 
-  <!-- 메인 퀴즈 화면 (처음 접속 시 바로 단어 퀴즈 시작) -->
-  <div id="mainApp">
+  <!-- 시작 전 인트로 명언 화면 -->
+  <div id="introScreen" class="quiz-box intro-card">
+    <div class="intro-icon">🔥</div>
+    <div class="intro-quote-box">
+      <div class="intro-japanese" id="introJpQuote">-</div>
+      <div class="intro-korean" id="introKoQuote">-</div>
+    </div>
+    <button type="button" class="btn-start-quiz" onclick="startQuiz()">시작하기 ➔</button>
+  </div>
+
+  <!-- 메인 퀴즈 화면 (시작하기 클릭 후 노출) -->
+  <div id="mainApp" style="display: none;">
     <header>
       <div class="title-box">
         <span class="badge">고등학교 일본어</span>
